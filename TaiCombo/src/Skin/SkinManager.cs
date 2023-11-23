@@ -58,7 +58,7 @@ class SkinManager
 
         GameEngine.Resolution = new Vector2D<int>(Value.Resolution.Width, Value.Resolution.Height);
 
-        Assets.Dispose();
+        Assets?.Dispose();
         Assets = new();
     }
 
