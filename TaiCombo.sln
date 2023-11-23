@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaiCombo", "TaiCombo\TaiCombo.csproj", "{BBC0B5DD-E66A-4521-B3C7-3945B29AE9DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaiCombo.Engine", "TaiCombo.Engine\TaiCombo.Engine.csproj", "{B0DAFD5C-6E38-4727-98BB-125887250D95}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaiCombo.Plugin", "TaiCombo.Plugin\TaiCombo.Plugin.csproj", "{914A6FAB-8601-4AF7-9453-4FA5130626A9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BBC0B5DD-E66A-4521-B3C7-3945B29AE9DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBC0B5DD-E66A-4521-B3C7-3945B29AE9DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BBC0B5DD-E66A-4521-B3C7-3945B29AE9DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BBC0B5DD-E66A-4521-B3C7-3945B29AE9DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0DAFD5C-6E38-4727-98BB-125887250D95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0DAFD5C-6E38-4727-98BB-125887250D95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0DAFD5C-6E38-4727-98BB-125887250D95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0DAFD5C-6E38-4727-98BB-125887250D95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{914A6FAB-8601-4AF7-9453-4FA5130626A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{914A6FAB-8601-4AF7-9453-4FA5130626A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{914A6FAB-8601-4AF7-9453-4FA5130626A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{914A6FAB-8601-4AF7-9453-4FA5130626A9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
