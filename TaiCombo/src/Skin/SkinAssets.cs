@@ -5,6 +5,7 @@ using TaiCombo.Common;
 using TaiCombo.Engine;
 using TaiCombo.Engine.Enums;
 using TaiCombo.Enums;
+using TaiCombo.Luas;
 
 
 namespace TaiCombo.Skin;
@@ -31,6 +32,7 @@ class SkinAssets : IDisposable
     public Sprite Options_Flip { get; private set; }
     public Dictionary<RandomType, Sprite> Options_Random { get; private set; } = new();
     public Sprite Options_Offset { get; private set; }
+
     
     public Dictionary<GaugeType, Sprite> Gauge_1P_Base { get; private set; } = new();
     public Dictionary<GaugeType, Sprite> Gauge_2P_Base { get; private set; } = new();
@@ -47,6 +49,10 @@ class SkinAssets : IDisposable
     public Sprite[] Gauge_Add { get; private set; } = new Sprite[Game.MAXPLAYER];
     public Sprite Gauge_SoulText { get; private set; }
     public Sprite Gauge_SoulFire { get; private set; }
+
+    public Dictionary<string, PlayBG> Play_BG_Up = new();
+    public Dictionary<string, PlayBG> Play_BG_Down = new();
+    public Dictionary<string, PlayBG> Play_BG_Down_Clear = new();
 
     public Sprite Play_Lane_Base_Main { get; private set; }
     public Sprite Play_Lane_Base_Normal { get; private set; }
@@ -196,6 +202,18 @@ class SkinAssets : IDisposable
         return sound;
     }
 
+    /// <summary>
+    /// PlayBGの作成と同時にDisposableAssetsに登録します
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    private PlayBG CreatePlayBG(string path)
+    {
+        PlayBG script = new(path);
+        DisposableAssets.Add(script);
+        return script;
+    }
+
 
     public SkinAssets()
     {
@@ -319,6 +337,24 @@ class SkinAssets : IDisposable
         Gauge_SoulFire = CreateSprite($"{gaugePath}SoulFire.png");
 
         string playPath = $"{Game.Skin.GraphicsPath}Play{Path.DirectorySeparatorChar}";
+
+        string bgPath = $"{playPath}Background{Path.DirectorySeparatorChar}Normal{Path.DirectorySeparatorChar}";
+        
+        string[] upBGs = Directory.GetDirectories($"{bgPath}Up{Path.DirectorySeparatorChar}");
+        for(int i = 0; i < upBGs.Length; i++)
+        {
+            Play_BG_Up.Add(Path.GetFileName(upBGs[i]), CreatePlayBG($"{upBGs[i]}{Path.DirectorySeparatorChar}Script.lua"));   
+        }
+        string[] downBGs = Directory.GetDirectories($"{bgPath}Down{Path.DirectorySeparatorChar}");
+        for(int i = 0; i < downBGs.Length; i++)
+        {
+            Play_BG_Down.Add(Path.GetFileName(downBGs[i]), CreatePlayBG($"{downBGs[i]}{Path.DirectorySeparatorChar}Script.lua"));   
+        }
+        string[] downClearBGs = Directory.GetDirectories($"{bgPath}Down_Clear{Path.DirectorySeparatorChar}");
+        for(int i = 0; i < downClearBGs.Length; i++)
+        {
+            Play_BG_Down_Clear.Add(Path.GetFileName(downClearBGs[i]), CreatePlayBG($"{downClearBGs[i]}{Path.DirectorySeparatorChar}Script.lua"));   
+        }
 
         Play_Lane_Base_Main = CreateSprite($"{playPath}Lane{Path.DirectorySeparatorChar}Base_Main.png");
         Play_Lane_Base_Normal = CreateSprite($"{playPath}Lane{Path.DirectorySeparatorChar}Base_Normal.png");

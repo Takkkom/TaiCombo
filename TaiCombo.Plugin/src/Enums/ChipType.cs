@@ -37,6 +37,8 @@ public enum ChipType
     Branch_N,
     Branch_E,
     Branch_M,
+    BranchSection,
+    BranchHold,
 
     Line,
     Line_Branched

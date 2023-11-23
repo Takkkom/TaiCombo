@@ -1,6 +1,7 @@
 using Silk.NET.Maths;
 
 using TaiCombo.Plugin.Enums;
+using TaiCombo.Plugin.Struct;
 
 namespace TaiCombo.Plugin.Chart;
 
@@ -32,6 +33,7 @@ public interface IChip
 
     public int NowRollCount { get; set; }
 
+    public BranchType GetNextBranch(BranchStates branchState);
 
     public void InitHBValue();
     

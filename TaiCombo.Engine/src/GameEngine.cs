@@ -265,6 +265,7 @@ public class GameEngine : IDisposable
 
             Gl = new GL(AngleContext);
             Gl.Enable(GLEnum.Blend);
+            AngleContext.SwapInterval(FrameMode_ == FrameMode.VSync ? 1 : 0);
             BlendHelper.SetBlend(BlendType.Normal);
             Sprite.Init();
 

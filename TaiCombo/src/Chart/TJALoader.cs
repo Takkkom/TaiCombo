@@ -179,6 +179,8 @@ class TJALoader : IChartInfo
 
     private TJAChip? PrevNote;
 
+    private bool BarLineOn;
+
     public void SetCommand(string text)
     {
         if (text == "#START")
@@ -195,6 +197,7 @@ class TJALoader : IChartInfo
             Chips = new();
             Courses.Add(CurrentCourseType, new Course(Level, Chips));
             LoadingChart = true;
+            BarLineOn = true;
 
             CurrentBranch = BranchType.Normal;
         }
@@ -261,7 +264,7 @@ class TJALoader : IChartInfo
                 chip.Delay = 0.0f;
             }
 
-            CurrentChips.Add(chip);
+            if (Math.Abs(chip.Delay) > 0.01) CurrentChips.Add(chip);
         }
         else if (text.StartsWith("#GOGOSTART"))
         {
@@ -277,10 +280,40 @@ class TJALoader : IChartInfo
 
             CurrentChips.Add(chip);
         }
+        else if (text.StartsWith("#BARLINEON"))
+        {
+            BarLineOn = true;
+        }
+        else if (text.StartsWith("#BARLINEOFF"))
+        {
+            BarLineOn = false;
+        }
         else if (text.StartsWith("#BRANCHSTART"))
         {
             TJAChip chip = new();
             chip.ChipType = ChipType.BranchStart;
+            
+            string[] values = text.Remove(0, 12).Split(',');
+            if (values[0].Contains("p"))
+            {
+                chip.BranchMode = TJABranchMode.Accuracy;
+            }
+            else if (values[0].Contains("r"))
+            {
+                chip.BranchMode = TJABranchMode.Roll;
+            }
+            else if (values[0].Contains("s"))
+            {
+                chip.BranchMode = TJABranchMode.Score;
+            }
+            else if (values[0].Contains("c"))
+            {
+                chip.BranchMode = TJABranchMode.Combo;
+            }
+
+            if (float.TryParse(values[1], out float value1)) chip.BranchStart_Expart = value1;
+            if (float.TryParse(values[2], out float value2)) chip.BranchStart_Master = value2;
+
 
             CurrentChips.Add(chip);
         }
@@ -288,6 +321,20 @@ class TJALoader : IChartInfo
         {
             TJAChip chip = new();
             chip.ChipType = ChipType.BranchEnd;
+
+            CurrentChips.Add(chip);
+        }
+        else if (text.StartsWith("#SECTION"))
+        {
+            TJAChip chip = new();
+            chip.ChipType = ChipType.BranchSection;
+
+            CurrentChips.Add(chip);
+        }
+        else if (text.StartsWith("#LEVELHOLD"))
+        {
+            TJAChip chip = new();
+            chip.ChipType = ChipType.BranchHold;
 
             CurrentChips.Add(chip);
         }
@@ -340,12 +387,21 @@ class TJALoader : IChartInfo
                         };
                         CurrentChips.Add(chip);
                         CurrentNoteCount++;
+                        
+                        if (BarLineOn)
+                        {
+                            TJAChip lineChip = new();
+                            lineChip.ChipType = ChipType.Line;
+                            lineChip.ScrollType = lineChip.ScrollType;
+                            CurrentChips.Add(lineChip);
+                        }
                     }
                     for(int j = 0; j < CurrentChips.Count; j++)
                     {
                         TJAChip chip = CurrentChips[j];
                         chip.Time = State.NowTime;
                         chip.HBTime = State.NowHBTime;
+                        chip.ScrollType = State.ScrollType;
 
 
                         switch(chip.ChipType)
@@ -437,8 +493,12 @@ class TJALoader : IChartInfo
                                 chip.Scroll = State.Scroll;
                                 chip.Measure = (State.Measure.Item1, State.Measure.Item2);
                                 chip.TimeGAP = State.TimeGAP;
-                                State.Delay += chip.Delay;
                                 chip.BranchType = CurrentBranch;
+                                State.Delay += chip.Delay;
+                                if (chip.Delay < 0)
+                                {
+                                    State.NowHBTime += (long)(chip.Delay * 4600.0f * chip.BPM);
+                                }
                             }
                             break;
                             case ChipType.GoGoStart:
@@ -493,7 +553,8 @@ class TJALoader : IChartInfo
                                 CurrentBranch = BranchType.Master;
                             }
                             break;
-                            default:
+                            case ChipType.Line:
+                            case ChipType.Line_Branched:
                             {
                                 chip.Time = PrevNote.Time;
                                 chip.HBTime = PrevNote.HBTime;
@@ -504,6 +565,10 @@ class TJALoader : IChartInfo
                                 chip.TimeGAP = State.TimeGAP;
                                 chip.Delay = State.Delay;
                                 chip.BranchType = CurrentBranch;
+                            }
+                            break;
+                            default:
+                            {
                             }
                             break;
                         }
@@ -528,7 +593,7 @@ class TJALoader : IChartInfo
                     }
                     CurrentChips.Add(chip);
 
-                    if (CurrentNoteCount == 0)
+                    if (CurrentNoteCount == 0 && BarLineOn)
                     {
                         TJAChip lineChip = new();
                         lineChip.ChipType = ChipType.Line;

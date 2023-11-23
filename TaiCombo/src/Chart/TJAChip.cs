@@ -2,6 +2,7 @@ using Silk.NET.Maths;
 using TaiCombo.Plugin;
 using TaiCombo.Plugin.Chart;
 using TaiCombo.Plugin.Enums;
+using TaiCombo.Plugin.Struct;
 
 namespace TaiCombo.Chart;
 
@@ -17,7 +18,13 @@ class TJAChip : IChip
 
     public BranchType BranchType { get; set; }
 
+    public TJABranchMode BranchMode;
+
     public int BalloonCount { get; set; }
+
+    public float BranchStart_Expart { get; set; }
+
+    public float BranchStart_Master { get; set; }
     
     public bool Hit { get; set; } = false;
     
@@ -87,6 +94,46 @@ class TJAChip : IChip
         CurrentDelayTotal = 0;
     }
 
+    public BranchType GetNextBranch(BranchStates branchState)
+    {
+        float value = 0;
+
+        switch(BranchMode)
+        {
+            case TJABranchMode.Accuracy:
+            {
+                int noteCount = branchState.Perfect + branchState.Ok + branchState.Miss;
+                float perfectRate = branchState.Perfect;
+                float okRate = branchState.Ok / 2.0f;
+                float goodMiss = 0;
+                value = (perfectRate + okRate + goodMiss) / (float)noteCount;
+                value *= 100;
+            }
+            break;
+            case TJABranchMode.Roll:
+            {
+                value = branchState.Roll;
+            }
+            break;
+            case TJABranchMode.Combo:
+            {
+                value = branchState.Combo;
+            }
+            break;
+            case TJABranchMode.Score:
+            {
+                value = branchState.Score;
+            }
+            break;
+            default:
+            break;
+        }
+        
+        if (value >= BranchStart_Master) return BranchType.Master;
+        else if (value >= BranchStart_Expart) return BranchType.Expert;
+        else return BranchType.Normal;
+    }
+
     public void Update(long time)
     {
         NowTime = Time - time;
@@ -109,10 +156,10 @@ class TJAChip : IChip
 
         if (ChipType == ChipType.Delay)
         {
-            float prevDelay = CurrentDelay;
-            CurrentDelay = Delay * 1000000;
             if (Delay > 0)
             {
+                float prevDelay = CurrentDelay;
+                CurrentDelay = Delay * 1000000;
                 if (NowTime < 0)
                 {
                     if (NowTime > -CurrentDelay)
@@ -127,19 +174,16 @@ class TJAChip : IChip
             }
             else 
             {
-                CurrentDelayTotal = -CurrentDelay - prevDelay;
+                //CurrentDelayTotal = -CurrentDelay - prevDelay;
             }
         }
 
         switch(ScrollType)
         {
             case TJAScrollType.BM:
-            {
-            }
-            break; 
             case TJAScrollType.HB:
             {
-                if (IsNote)
+                if ((IsNote || ChipType == ChipType.None || ChipType == ChipType.Line || ChipType == ChipType.Line_Branched) && Active)
                 {
                     if (NowTime < 0)
                     {
@@ -151,7 +195,6 @@ class TJAChip : IChip
                     }
                     NowHBTime = HBTime - ((((time + CurrentDelayTotal) * CurrentBPM) + CurrentTimeGap) / 240.0f);
                 }
-
             }
             break; 
             default:

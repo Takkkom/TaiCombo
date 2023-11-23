@@ -40,6 +40,8 @@ class Lane
     private BranchType PrevBranch;
     private BranchType CurrentBranch;
 
+    private bool Branchable;
+
     public void AddFlash(int hitType)
     {
         LaneFlashInfo flash = new()
@@ -71,9 +73,10 @@ class Lane
         BranchCounter = 0;
     }
 
-    public Lane(int player)
+    public Lane(int player, bool branchable)
     {
         Player = player;
+        Branchable = branchable;
     }
 
     public void Update()
@@ -169,47 +172,50 @@ class Lane
         Game.Skin.Assets.Play_Lane_Base_Main.Draw(Game.Skin.Value.Play_Lane_Main[Player].X, Game.Skin.Value.Play_Lane_Main[Player].Y);
         Game.Skin.Assets.Play_Lane_Base_Sub.Draw(Game.Skin.Value.Play_Lane_Sub[Player].X, Game.Skin.Value.Play_Lane_Sub[Player].Y);
 
-        float prevOpacity = 1 - BranchCounter;
-        Color4 prevColor = new Color4(1, 1, 1, prevOpacity);
-
-        float textOut = EasingHelper.EaseInBack(BranchCounter * 1.1f);
-        float textIn = 1.0f - EasingHelper.EaseOutBack((BranchCounter - 0.5f) * 2.0f);
-        Color4 prevTextColor = new Color4(1, 1, 1, 1 - (textOut * 3.0f));
-        Color4 curTextColor = new Color4(1, 1, 1, 1 - (textIn * 3.0f));
-        float vector = CurrentBranch > PrevBranch ? 1 : -1;
-        float prevTextY = textOut * -200.0f * vector;
-        float curTextY = textIn * 200.0f * vector;
-
-        switch(CurrentBranch)
+        if (Branchable)
         {
-            case BranchType.Normal:
-            Game.Skin.Assets.Play_Lane_Base_Normal.Draw(Game.Skin.Value.Play_Lane_Main[Player].X, Game.Skin.Value.Play_Lane_Main[Player].Y);
-            Game.Skin.Assets.Play_Lane_Text_Normal.Draw(Game.Skin.Value.Play_Lane_Main[Player].X, Game.Skin.Value.Play_Lane_Main[Player].Y + curTextY, color:curTextColor);
-            break;
-            case BranchType.Expert:
-            Game.Skin.Assets.Play_Lane_Base_Expert.Draw(Game.Skin.Value.Play_Lane_Main[Player].X, Game.Skin.Value.Play_Lane_Main[Player].Y);
-            Game.Skin.Assets.Play_Lane_Text_Expert.Draw(Game.Skin.Value.Play_Lane_Main[Player].X, Game.Skin.Value.Play_Lane_Main[Player].Y + curTextY, color:curTextColor);
-            break;
-            case BranchType.Master:
-            Game.Skin.Assets.Play_Lane_Base_Master.Draw(Game.Skin.Value.Play_Lane_Main[Player].X, Game.Skin.Value.Play_Lane_Main[Player].Y);
-            Game.Skin.Assets.Play_Lane_Text_Master.Draw(Game.Skin.Value.Play_Lane_Main[Player].X, Game.Skin.Value.Play_Lane_Main[Player].Y + curTextY, color:curTextColor);
-            break;
-        }
+            float prevOpacity = 1 - BranchCounter;
+            Color4 prevColor = new Color4(1, 1, 1, prevOpacity);
 
-        switch(PrevBranch)
-        {
-            case BranchType.Normal:
-            Game.Skin.Assets.Play_Lane_Base_Normal.Draw(Game.Skin.Value.Play_Lane_Main[Player].X, Game.Skin.Value.Play_Lane_Main[Player].Y, color:prevColor);
-            Game.Skin.Assets.Play_Lane_Text_Normal.Draw(Game.Skin.Value.Play_Lane_Main[Player].X, Game.Skin.Value.Play_Lane_Main[Player].Y + prevTextY, color:prevTextColor);
-            break;
-            case BranchType.Expert:
-            Game.Skin.Assets.Play_Lane_Base_Expert.Draw(Game.Skin.Value.Play_Lane_Main[Player].X, Game.Skin.Value.Play_Lane_Main[Player].Y, color:prevColor);
-            Game.Skin.Assets.Play_Lane_Text_Expert.Draw(Game.Skin.Value.Play_Lane_Main[Player].X, Game.Skin.Value.Play_Lane_Main[Player].Y + prevTextY, color:prevTextColor);
-            break;
-            case BranchType.Master:
-            Game.Skin.Assets.Play_Lane_Base_Master.Draw(Game.Skin.Value.Play_Lane_Main[Player].X, Game.Skin.Value.Play_Lane_Main[Player].Y, color:prevColor);
-            Game.Skin.Assets.Play_Lane_Text_Master.Draw(Game.Skin.Value.Play_Lane_Main[Player].X, Game.Skin.Value.Play_Lane_Main[Player].Y + prevTextY, color:prevTextColor);
-            break;
+            float textOut = EasingHelper.EaseInBack(BranchCounter * 1.1f);
+            float textIn = 1.0f - EasingHelper.EaseOutBack((BranchCounter - 0.5f) * 2.0f);
+            Color4 prevTextColor = new Color4(1, 1, 1, 1 - (textOut * 3.0f));
+            Color4 curTextColor = new Color4(1, 1, 1, 1 - (textIn * 3.0f));
+            float vector = CurrentBranch > PrevBranch ? 1 : -1;
+            float prevTextY = textOut * -200.0f * vector;
+            float curTextY = textIn * 200.0f * vector;
+
+            switch(CurrentBranch)
+            {
+                case BranchType.Normal:
+                Game.Skin.Assets.Play_Lane_Base_Normal.Draw(Game.Skin.Value.Play_Lane_Main[Player].X, Game.Skin.Value.Play_Lane_Main[Player].Y);
+                Game.Skin.Assets.Play_Lane_Text_Normal.Draw(Game.Skin.Value.Play_Lane_Main[Player].X, Game.Skin.Value.Play_Lane_Main[Player].Y + curTextY, color:curTextColor);
+                break;
+                case BranchType.Expert:
+                Game.Skin.Assets.Play_Lane_Base_Expert.Draw(Game.Skin.Value.Play_Lane_Main[Player].X, Game.Skin.Value.Play_Lane_Main[Player].Y);
+                Game.Skin.Assets.Play_Lane_Text_Expert.Draw(Game.Skin.Value.Play_Lane_Main[Player].X, Game.Skin.Value.Play_Lane_Main[Player].Y + curTextY, color:curTextColor);
+                break;
+                case BranchType.Master:
+                Game.Skin.Assets.Play_Lane_Base_Master.Draw(Game.Skin.Value.Play_Lane_Main[Player].X, Game.Skin.Value.Play_Lane_Main[Player].Y);
+                Game.Skin.Assets.Play_Lane_Text_Master.Draw(Game.Skin.Value.Play_Lane_Main[Player].X, Game.Skin.Value.Play_Lane_Main[Player].Y + curTextY, color:curTextColor);
+                break;
+            }
+
+            switch(PrevBranch)
+            {
+                case BranchType.Normal:
+                Game.Skin.Assets.Play_Lane_Base_Normal.Draw(Game.Skin.Value.Play_Lane_Main[Player].X, Game.Skin.Value.Play_Lane_Main[Player].Y, color:prevColor);
+                Game.Skin.Assets.Play_Lane_Text_Normal.Draw(Game.Skin.Value.Play_Lane_Main[Player].X, Game.Skin.Value.Play_Lane_Main[Player].Y + prevTextY, color:prevTextColor);
+                break;
+                case BranchType.Expert:
+                Game.Skin.Assets.Play_Lane_Base_Expert.Draw(Game.Skin.Value.Play_Lane_Main[Player].X, Game.Skin.Value.Play_Lane_Main[Player].Y, color:prevColor);
+                Game.Skin.Assets.Play_Lane_Text_Expert.Draw(Game.Skin.Value.Play_Lane_Main[Player].X, Game.Skin.Value.Play_Lane_Main[Player].Y + prevTextY, color:prevTextColor);
+                break;
+                case BranchType.Master:
+                Game.Skin.Assets.Play_Lane_Base_Master.Draw(Game.Skin.Value.Play_Lane_Main[Player].X, Game.Skin.Value.Play_Lane_Main[Player].Y, color:prevColor);
+                Game.Skin.Assets.Play_Lane_Text_Master.Draw(Game.Skin.Value.Play_Lane_Main[Player].X, Game.Skin.Value.Play_Lane_Main[Player].Y + prevTextY, color:prevTextColor);
+                break;
+            }
         }
 
 

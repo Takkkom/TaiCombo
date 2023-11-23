@@ -312,7 +312,7 @@ static class NoteHelper
             if (chip.ChipType == ChipType.BranchStart || chip.ChipType == ChipType.BranchEnd) 
             {
                 chip.Active = true;
-                break;
+                continue;
             }
 
             if (chip.BranchType == branch)

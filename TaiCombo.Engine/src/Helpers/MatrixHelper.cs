@@ -18,9 +18,12 @@ public static class MatrixHelper
         //-----
 
         //回転-----
-        mvp *= Matrix4X4.CreateScale(1.0f * gameAspect, 1.0f, 1.0f) * //ここでアスペクト比でスケーリングしないとおかしなことになる
-            Matrix4X4.CreateRotationZ(rotation) * 
-            Matrix4X4.CreateScale(1.0f / gameAspect, 1.0f, 1.0f);//回転した後戻してあげる
+        if (rotation != 0)
+        {
+            mvp *= Matrix4X4.CreateScale(1.0f * gameAspect, 1.0f, 1.0f) * //ここでアスペクト比でスケーリングしないとおかしなことになる
+                Matrix4X4.CreateRotationZ(rotation) * 
+                Matrix4X4.CreateScale(1.0f / gameAspect, 1.0f, 1.0f);//回転した後戻してあげる
+        }
         //-----
 
         //移動----

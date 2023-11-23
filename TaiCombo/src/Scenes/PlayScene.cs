@@ -9,6 +9,7 @@ using TaiCombo.Helper;
 using TaiCombo.Structs;
 using TaiCombo.Plugin.Enums;
 using TaiCombo.Skin;
+using TaiCombo.Plugin.Struct;
 
 namespace TaiCombo.Scenes;
 
@@ -55,6 +56,7 @@ class PlayScene : Scene
                 chip.NowRollCount = 0;
             }
             GoGoTime[player] = false;
+            BranchHold[player] = false;
             
             NoteHelper.BranchChips(Chips[player], 0, BranchType.Normal);
         }
@@ -75,6 +77,8 @@ class PlayScene : Scene
     private IChartInfo Chart;
 
     public List<IChip>[] Chips = new List<IChip>[Game.MAXPLAYER];
+
+    private Background Background;
 
     private Lane[] Lane = new Lane[Game.MAXPLAYER];
 
@@ -100,6 +104,8 @@ class PlayScene : Scene
 
     private PlayStates[] States = new PlayStates[Game.MAXPLAYER];
 
+    private BranchStates[] BranchStates = new BranchStates[Game.MAXPLAYER];
+
     private IChip[] CurrentChip = new IChip[Game.MAXPLAYER];
 
     private IChip?[] CurrentRollChip = new IChip?[Game.MAXPLAYER];
@@ -111,6 +117,10 @@ class PlayScene : Scene
     private float[] RollCloseCounter = new float[Game.MAXPLAYER];
 
     private int[] NoteFrame = new int[Game.MAXPLAYER];
+
+    private bool[] Branchable = new bool[Game.MAXPLAYER];
+
+    private bool[] BranchHold = new bool[Game.MAXPLAYER];
 
     private void Event(PlayEventType playEventType, int player)
     {
@@ -149,6 +159,11 @@ class PlayScene : Scene
             for(int i = 0; i < course.Chips.Count; i++)
             {
                 IChip chip = course.Chips[i].Copy();
+
+                if (!Branchable[player] && chip.ChipType == ChipType.BranchStart)
+                {
+                    Branchable[player] = true;
+                }
 
                 switch(Options[player].Random)
                 {
@@ -247,6 +262,9 @@ class PlayScene : Scene
                 States[player].Gauge += AddGauges[player].Perfect;
                 States[player].Gauge = Math.Min(Math.Max(States[player].Gauge, 0), 100);
                 States[player].Combo++;
+
+                BranchStates[player].Perfect++;
+                BranchStates[player].Combo++;
                 
                 Gauge[player].SetValue(States[player].Gauge);
                 TaikoUI[player].SetCombo(States[player].Combo);
@@ -264,6 +282,9 @@ class PlayScene : Scene
                 States[player].Gauge = Math.Min(Math.Max(States[player].Gauge, 0), 100);
                 States[player].Combo++;
                 
+                BranchStates[player].Ok++;
+                BranchStates[player].Combo++;
+                
                 Gauge[player].SetValue(States[player].Gauge);
                 TaikoUI[player].SetCombo(States[player].Combo);
                 TaikoUI[player].AddScore(AddScores[player].Ok);
@@ -280,6 +301,9 @@ class PlayScene : Scene
                 States[player].Gauge = Math.Min(Math.Max(States[player].Gauge, 0), 100);
                 States[player].Combo = 0;
                 
+                BranchStates[player].Miss = 0;
+                BranchStates[player].Combo = 0;
+                
                 Gauge[player].SetValue(States[player].Gauge);
                 TaikoUI[player].SetCombo(States[player].Combo);
                 TaikoUI[player].AddScore(AddScores[player].Miss);
@@ -290,6 +314,8 @@ class PlayScene : Scene
             {
                 States[player].Roll++;
                 States[player].Score += AddScores[player].Roll;
+                BranchStates[player].Roll++;
+                BranchStates[player].Score += AddScores[player].Roll;
                 TaikoUI[player].AddScore(AddScores[player].Roll);
                 TaikoUI[player].SetScore(States[player].Score);
 
@@ -314,6 +340,8 @@ class PlayScene : Scene
             {
                 States[player].Roll++;
                 States[player].Score += AddScores[player].Roll_Big;
+                BranchStates[player].Roll++;
+                BranchStates[player].Roll += AddScores[player].Roll_Big;
                 TaikoUI[player].AddScore(AddScores[player].Roll_Big);
                 TaikoUI[player].SetScore(States[player].Score);
 
@@ -338,6 +366,8 @@ class PlayScene : Scene
             {
                 States[player].Roll++;
                 States[player].Score += AddScores[player].Balloon_Roll;
+                BranchStates[player].Roll++;
+                BranchStates[player].Score += AddScores[player].Balloon_Roll;
                 TaikoUI[player].AddScore(AddScores[player].Balloon_Roll);
                 TaikoUI[player].SetScore(States[player].Score);
 
@@ -351,6 +381,8 @@ class PlayScene : Scene
             {
                 States[player].Roll++;
                 States[player].Score += AddScores[player].Balloon_Broke;
+                BranchStates[player].Roll++;
+                BranchStates[player].Score += AddScores[player].Balloon_Broke;
                 TaikoUI[player].AddScore(AddScores[player].Balloon_Broke);
                 TaikoUI[player].SetScore(States[player].Score);
 
@@ -364,6 +396,8 @@ class PlayScene : Scene
             {
                 States[player].Roll++;
                 States[player].Score += AddScores[player].Kusudama_Roll;
+                BranchStates[player].Roll++;
+                BranchStates[player].Score += AddScores[player].Kusudama_Roll;
                 TaikoUI[player].AddScore(AddScores[player].Kusudama_Roll);
                 TaikoUI[player].SetScore(States[player].Score);
             }
@@ -372,6 +406,8 @@ class PlayScene : Scene
             {
                 States[player].Roll++;
                 States[player].Score += AddScores[player].Kusudama_Broke;
+                BranchStates[player].Roll++;
+                BranchStates[player].Score += AddScores[player].Kusudama_Broke;
                 TaikoUI[player].AddScore(AddScores[player].Kusudama_Broke);
                 TaikoUI[player].SetScore(States[player].Score);
             }
@@ -671,7 +707,7 @@ class PlayScene : Scene
             case ChipType.BranchStart:
             if (nowTime < 0 && !chip.Over)
             {
-                BranchType branchType = BranchType.Master;
+                BranchType branchType = chip.GetNextBranch(BranchStates[player]);
                 NoteHelper.BranchChips(Chips[player], index + 1, branchType);
                 Lane[player].Branch(branchType);
                 chip.Over = true;
@@ -681,6 +717,20 @@ class PlayScene : Scene
             if (nowTime < 0 && !chip.Over)
             {
                 
+                chip.Over = true;
+            }
+            break;
+            case ChipType.BranchSection:
+            if (nowTime < 0 && !chip.Over && chip.Active)
+            {
+                BranchStates[player] = new();
+                chip.Over = true;
+            }
+            break;
+            case ChipType.BranchHold:
+            if (nowTime < 0 && !chip.Over && chip.Active)
+            {
+                BranchHold[player] = true;
                 chip.Over = true;
             }
             break;
@@ -712,6 +762,8 @@ class PlayScene : Scene
 
         LoadChart(ChartPath);
 
+        Background = new();
+
         for(int player = 0; player < PlayerCount; player++)
         {
             if ((int)GaugeType[player] == -1)
@@ -734,7 +786,7 @@ class PlayScene : Scene
 
             int taikoSide = player;
             TaikoUI[player] = new(player, taikoSide, (int)Courses[player], Options[player]);
-            Lane[player] = new(player);
+            Lane[player] = new(player, Branchable[player]);
             Gauge[player] = new(GaugeType[player], player, taikoSide);
             HitExplosion[player] = new(player);
             JudgeAnimes[player] = new(player);
@@ -811,6 +863,8 @@ class PlayScene : Scene
         {
             PlayingBGM = false;
         }
+
+        Background.Update();
 
         for(int player = 0; player < PlayerCount; player++)
         {
@@ -936,6 +990,8 @@ class PlayScene : Scene
 
     public override void Draw()
     {
+        Background.Draw();
+        
         for(int player = 0; player < PlayerCount; player++)
         {
             Lane[player].Draw();

@@ -20,9 +20,6 @@ class StartupScene : Scene
             GameEngine.SceneManager_.ChangeScene(new PlayScene(new () { 
                 { "PlayerCount", 2 },
                 //{ "ChartPath", "Songs/dummy.tja" },
-                { "ChartPath", "Songs/Verlesq/Verlesq.tja" },
-                //{ "ChartPath", "Songs/Nosferatu/Nosferatu.tja" },
-                //{ "ChartPath", "Songs/ドキドキ胸きゅん おまつりタイム/ドキドキ胸きゅん おまつりタイム.tja" },
                 //{ "Courses", new Plugin.Enums.CourseType[] { Plugin.Enums.CourseType.Edit, Plugin.Enums.CourseType.Edit } },
                 { "Courses", new Plugin.Enums.CourseType[] { Plugin.Enums.CourseType.Oni, Plugin.Enums.CourseType.Oni } },
                 { "Options", new Options[] { 
