@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Silk.NET.Windowing" Version="2.19.0"/>
+    <PackageReference Include="Silk.NET.OpenGLES" Version="2.19.0"/>
+    <PackageReference Include="SkiaSharp" Version="2.88.6"/>
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.6"/>
+    <PackageReference Include="SkiaSharp.NativeAssets.macOS" Version="2.88.6"/>
+    <PackageReference Include="Silk.NET.Input" Version="2.19.0"/>
+    <PackageReference Include="ManagedBass" Version="3.1.1"/>
+    <PackageReference Include="NLua" Version="1.6.3"/>
+    <PackageReference Include="Silk.NET.OpenGLES.Extensions.ImGui" Version="2.19.0"/>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Libs/win-x64/*" CopyToOutputDirectory="PreserveNewest"/>
+    <Content Include="Libs/win-x86/*" CopyToOutputDirectory="PreserveNewest"/>
+    <Content Include="Libs/osx-x64/*" CopyToOutputDirectory="PreserveNewest"/>
+    <Content Include="Libs/linux-x64/*" CopyToOutputDirectory="PreserveNewest"/>
+  </ItemGroup>
+</Project>

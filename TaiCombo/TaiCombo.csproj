@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Silk.NET.Windowing" Version="2.19.0"/>
+    <PackageReference Include="Silk.NET.OpenGLES" Version="2.19.0"/>
+    <PackageReference Include="SkiaSharp" Version="2.88.6"/>
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.6"/>
+    <PackageReference Include="SkiaSharp.NativeAssets.macOS" Version="2.88.6"/>
+    <PackageReference Include="Silk.NET.Input" Version="2.19.0"/>
+    <PackageReference Include="ManagedBass" Version="3.1.1"/>
+    <PackageReference Include="NLua" Version="1.6.3"/>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.8.0-3.final"/>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Readme.txt" CopyToOutputDirectory="PreserveNewest"/>
+    <Content Include="../LICENSE" CopyToOutputDirectory="PreserveNewest"/>
+    <Content Include="Licenses/**" CopyToOutputDirectory="PreserveNewest"/>
+    <Content Include="Skins/**" CopyToOutputDirectory="PreserveNewest"/>
+    <Content Include="Songs/**" CopyToOutputDirectory="PreserveNewest"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TaiCombo.Engine\TaiCombo.Engine.csproj"/>
+    <ProjectReference Include="..\TaiCombo.Plugin\TaiCombo.Plugin.csproj"/>
+  </ItemGroup>
+</Project>
