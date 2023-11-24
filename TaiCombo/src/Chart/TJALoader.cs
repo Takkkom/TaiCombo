@@ -19,7 +19,7 @@ class TJALoader : IChartInfo
     public Dictionary<CourseType, Course> Courses { get; set; } = new();
 
     private float InitBPM = 150;
-    private float Level;
+    private int Level;
     private List<int> Balloons = new();
     private List<IChip> Chips = new();
     private List<TJAChip> CurrentChips = new();

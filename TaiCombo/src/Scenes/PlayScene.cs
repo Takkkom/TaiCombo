@@ -795,22 +795,44 @@ class PlayScene : Scene
 
         for(int player = 0; player < PlayerCount; player++)
         {
-            if ((int)GaugeType[player] == -1)
+            switch(GameMode)
             {
-                switch(Courses[player])
+                case GameModeType.Play:
                 {
-                    case CourseType.Easy:
-                    GaugeType[player] = Enums.GaugeType.Level0;
-                    break;
-                    case CourseType.Normal:
-                    case CourseType.Hard:
-                    GaugeType[player] = Enums.GaugeType.Level1;
-                    break;
-                    case CourseType.Oni:
-                    case CourseType.Edit:
-                    GaugeType[player] = Enums.GaugeType.Level2;
-                    break;
+                    if ((int)GaugeType[player] == -1)
+                    {
+                        switch(Courses[player])
+                        {
+                            case CourseType.Easy:
+                            GaugeType[player] = Enums.GaugeType.Level0;
+                            break;
+                            case CourseType.Normal:
+                            case CourseType.Hard:
+                            GaugeType[player] = Enums.GaugeType.Level1;
+                            break;
+                            case CourseType.Oni:
+                            case CourseType.Edit:
+                            GaugeType[player] = Enums.GaugeType.Level2;
+                            break;
+                        }
+                    }
                 }
+                break;
+                case GameModeType.Training:
+                {
+                    GaugeType[player] = Enums.GaugeType.None;
+                }
+                break;
+                case GameModeType.Dan:
+                {
+                    GaugeType[player] = Enums.GaugeType.Dan;
+                }
+                break;
+                case GameModeType.Tower:
+                {
+                    GaugeType[player] = Enums.GaugeType.None;
+                }
+                break;
             }
 
             int taikoSide = player;
@@ -827,7 +849,7 @@ class PlayScene : Scene
             ScoreRank[player] = new(player);
             JudgeZones[player] = NoteHelper.JudgeZones[Courses[player]];
             AddScores[player] = ScoreHelper.GetAddScores(Chips[player], ScoreType.Gen4);
-            AddGauges[player] = GaugeHelper.GetAddGauge(Chips[player], Courses[player], Chart.Courses[Courses[player]].Level);
+            AddGauges[player] = GaugeHelper.GetAddGauge(Chips[player], Courses[player], GaugeType[player], Chart.Courses[Courses[player]].Level);
         }
 
         NowTime = -1500000;

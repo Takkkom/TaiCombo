@@ -5,5 +5,6 @@ enum GameModeType
 {
     Play,
     Training,
-    Dan
+    Dan,
+    Tower
 }
