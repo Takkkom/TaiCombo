@@ -1,32 +1,28 @@
-using System.Drawing;
-using Silk.NET.Maths;
 using TaiCombo.Common;
 using TaiCombo.Engine;
-using TaiCombo.Engine.Struct;
-using TaiCombo.Enums;
-using TaiCombo.Helper;
+using TaiCombo.Engine.Enums;
 using TaiCombo.Luas;
-using TaiCombo.Plugin.Chart;
 
 namespace TaiCombo.Objects;
 
 class Background
 {
-    private PlayBG Up;
+    private PlayBG? Up;
     private PlayBG? Down;
     private PlayBG? Down_Clear;
+    private Sprite? Footer;
 
 
     public void ClearIn(int player)
     {
-        Up.ClearIn(player + 1);
+        Up?.ClearIn(player + 1);
         Down?.ClearIn(player + 1);
         Down_Clear?.ClearIn(player + 1);
     }
 
     public void ClearOut(int player)
     {
-        Up.ClearOut(player + 1);
+        Up?.ClearOut(player + 1);
         Down?.ClearOut(player + 1);
         Down_Clear?.ClearOut(player + 1);
     }
@@ -45,15 +41,20 @@ class Background
 
     public void Update()
     {
-        Up.Update();
+        Up?.Update();
         Down?.Update();
         Down_Clear?.Update();
     }
 
     public void Draw()
     {
-        Up.Draw();
+        Up?.Draw();
         Down?.Draw();
         Down_Clear?.Draw();
+    }
+
+    public void DrawAfterDancer()
+    {
+        Footer?.Draw(0, GameEngine.Resolution.Y, drawOriginType:DrawOriginType.Left_Down);
     }
 }

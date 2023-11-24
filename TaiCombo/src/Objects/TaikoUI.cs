@@ -1,4 +1,3 @@
-using Silk.NET.Maths;
 using TaiCombo.Common;
 using TaiCombo.Engine;
 using TaiCombo.Engine.Struct;

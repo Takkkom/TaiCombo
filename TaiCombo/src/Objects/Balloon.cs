@@ -1,11 +1,8 @@
-using System.Drawing;
-using Silk.NET.Maths;
 using TaiCombo.Common;
 using TaiCombo.Engine;
+using TaiCombo.Engine.Enums;
 using TaiCombo.Engine.Struct;
-using TaiCombo.Enums;
 using TaiCombo.Helper;
-using TaiCombo.Plugin.Chart;
 
 namespace TaiCombo.Objects;
 
@@ -162,7 +159,7 @@ class Balloon
                     float rotation = -value * MathF.PI;
 
 
-                    Game.Skin.Assets.Play_Balloon_Miss.Draw(x, y, rotation:rotation, drawOriginType:Engine.Enums.DrawOriginType.Center);
+                    Game.Skin.Assets.Play_Balloon_Miss.Draw(x, y, rotation:rotation, drawOriginType:DrawOriginType.Center);
                 }
             }
             break;

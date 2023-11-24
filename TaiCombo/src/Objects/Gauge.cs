@@ -1,13 +1,10 @@
 using System.Drawing;
-using System.Net.Mail;
-using Silk.NET.Maths;
 using TaiCombo.Common;
 using TaiCombo.Engine;
 using TaiCombo.Engine.Enums;
 using TaiCombo.Engine.Struct;
 using TaiCombo.Enums;
 using TaiCombo.Helper;
-using TaiCombo.Plugin.Chart;
 
 namespace TaiCombo.Objects;
 

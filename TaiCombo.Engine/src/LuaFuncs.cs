@@ -6,7 +6,7 @@ namespace TaiCombo.Engine;
 
 public class LuaFuncs
 {
-    private Dictionary<string, Sprite> Sprites = new();
+    private List<Sprite> Sprites = new();
 
     private string BaseDir;
 
@@ -15,28 +15,30 @@ public class LuaFuncs
         BaseDir = $"{fileName}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}";
     }
 
-    public void AddSprite(string fileName)
+    public int AddSprite(string fileName)
     {
         string truePath = fileName.Replace('/', Path.DirectorySeparatorChar);
-        Sprites.Add(fileName, new Sprite($"{BaseDir}{truePath}"));
+        Sprites.Add(new Sprite($"{BaseDir}{truePath}"));
+
+        return Sprites.Count - 1;
     }
 
-    public void DrawSpriteOpacity(float x, float y, float opacity, string fileName)
+    public void DrawSpriteOpacity(float x, float y, float opacity, int index)
     {
-        Sprite sprite = Sprites[fileName];
-        DrawSpriteFull(x, y, 1, 1, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, 0, 1, 1, 1, opacity, "Left_Up", "Normal", fileName);
+        Sprite sprite = Sprites[index];
+        DrawSpriteFull(x, y, 1, 1, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, 0, 1, 1, 1, opacity, "Left_Up", "Normal", index);
     }
 
-    public void DrawSpriteBlendOpacity(float x, float y, float opacity, string blend, string fileName)
+    public void DrawSpriteBlendOpacity(float x, float y, float opacity, string blend, int index)
     {
-        Sprite sprite = Sprites[fileName];
-        DrawSpriteFull(x, y, 1, 1, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, 0, 1, 1, 1, opacity, "Left_Up", blend, fileName);
+        Sprite sprite = Sprites[index];
+        DrawSpriteFull(x, y, 1, 1, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, 0, 1, 1, 1, opacity, "Left_Up", blend, index);
     }
 
-    public void DrawSprite(float x, float y, string fileName)
+    public void DrawSprite(float x, float y, int index)
     {
-        Sprite sprite = Sprites[fileName];
-        DrawSpriteFull(x, y, 1, 1, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, 0, 1, 1, 1, 1, "Left_Up", "Normal", fileName);
+        Sprite sprite = Sprites[index];
+        DrawSpriteFull(x, y, 1, 1, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, 0, 1, 1, 1, 1, "Left_Up", "Normal", index);
     }
 
     public void DrawSpriteFull(
@@ -47,9 +49,9 @@ public class LuaFuncs
         float rotation, 
         float red, float green, float blue,  float alpha,
         string drawOrigin, string blend,
-        string fileName)
+        int index)
     {
-        Sprite sprite = Sprites[fileName];
+        Sprite sprite = Sprites[index];
 
         DrawOriginType drawOriginType;
         switch(drawOrigin)
@@ -112,15 +114,15 @@ public class LuaFuncs
         sprite.Draw(x, y, scaleX, scaleY, new System.Drawing.RectangleF(rectX, rectY, rectWidth, rectHeight), flipX, flipY, rotation, new Struct.Color4(red, green, blue, alpha), drawOriginType, blendType);
     }
 
-    public int GetSpriteWidth(string fileName)
+    public int GetSpriteWidth(int index)
     {
-        Sprite sprite = Sprites[fileName];
+        Sprite sprite = Sprites[index];
         return sprite.TextureSize.Width;
     }
 
-    public int GetSpriteHeight(string fileName)
+    public int GetSpriteHeight(int index)
     {
-        Sprite sprite = Sprites[fileName];
+        Sprite sprite = Sprites[index];
         return sprite.TextureSize.Height;
     }
 }

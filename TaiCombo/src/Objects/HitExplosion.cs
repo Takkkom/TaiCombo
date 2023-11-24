@@ -1,12 +1,8 @@
 using System.Drawing;
-using System.Net.Mail;
-using Silk.NET.Maths;
 using TaiCombo.Common;
 using TaiCombo.Engine;
 using TaiCombo.Engine.Enums;
 using TaiCombo.Engine.Struct;
-using TaiCombo.Enums;
-using TaiCombo.Plugin.Chart;
 
 namespace TaiCombo.Objects;
 
@@ -43,7 +39,7 @@ class HitExplosion
         for(int i = 0; i < Effects.Count; i++)
         {
             EffectInfo effect = Effects[i];
-            effect.Value += (7f * GameEngine.Time_.DeltaTime);
+            effect.Value += 7f * GameEngine.Time_.DeltaTime;
 
             if (effect.Value > 2.5f)
             {

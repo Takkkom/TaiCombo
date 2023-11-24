@@ -1,9 +1,5 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Silk.NET.Windowing;
 using TaiCombo.Common;
 using TaiCombo.Engine;
-using TaiCombo.Engine.Enums;
 using TaiCombo.Enums;
 using TaiCombo.Luas;
 
@@ -53,6 +49,7 @@ class SkinAssets : IDisposable
     public Dictionary<string, PlayBG> Play_BG_Up = new();
     public Dictionary<string, PlayBG> Play_BG_Down = new();
     public Dictionary<string, PlayBG> Play_BG_Down_Clear = new();
+    public Dictionary<string, Sprite> Play_BG_Footer = new();
 
     public Sprite Play_Lane_Base_Main { get; private set; }
     public Sprite Play_Lane_Base_Normal { get; private set; }
@@ -354,6 +351,11 @@ class SkinAssets : IDisposable
         for(int i = 0; i < downClearBGs.Length; i++)
         {
             Play_BG_Down_Clear.Add(Path.GetFileName(downClearBGs[i]), CreatePlayBG($"{downClearBGs[i]}{Path.DirectorySeparatorChar}Script.lua"));   
+        }
+        string[] downFooters = Directory.GetFiles($"{bgPath}Footer{Path.DirectorySeparatorChar}", "*.png");
+        for(int i = 0; i < downFooters.Length; i++)
+        {
+            Play_BG_Footer.Add(Path.GetFileNameWithoutExtension(downFooters[i]), CreateSprite(downFooters[i]));   
         }
 
         Play_Lane_Base_Main = CreateSprite($"{playPath}Lane{Path.DirectorySeparatorChar}Base_Main.png");

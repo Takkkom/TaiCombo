@@ -1,11 +1,8 @@
 using System.Drawing;
-using Silk.NET.Maths;
 using TaiCombo.Common;
 using TaiCombo.Engine;
 using TaiCombo.Engine.Struct;
-using TaiCombo.Enums;
 using TaiCombo.Helper;
-using TaiCombo.Plugin.Chart;
 using TaiCombo.Plugin.Enums;
 
 namespace TaiCombo.Objects;

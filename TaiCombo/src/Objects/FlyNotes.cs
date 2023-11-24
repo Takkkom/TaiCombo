@@ -1,14 +1,8 @@
-using System.Drawing;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
-using System.Net.Mail;
-using Silk.NET.Maths;
+using Microsoft.CodeAnalysis.Scripting;
 using TaiCombo.Common;
 using TaiCombo.Engine;
-using TaiCombo.Engine.Enums;
-using TaiCombo.Engine.Struct;
 using TaiCombo.Enums;
-using TaiCombo.Helper;
-using TaiCombo.Plugin.Chart;
 
 namespace TaiCombo.Objects;
 
@@ -34,8 +28,8 @@ class FlyNotes
 
     private int Player;
 
-    private Microsoft.CodeAnalysis.Scripting.Script<float> MoveScriptX;
-    private Microsoft.CodeAnalysis.Scripting.Script<float> MoveScriptY;
+    private Script<float> MoveScriptX;
+    private Script<float> MoveScriptY;
 
     private const int MAXNOTECOUNT = 20;
     private const int FRAMECOUNT = 30;
@@ -63,7 +57,7 @@ class FlyNotes
     {
         Player = player;
 
-        var option = Microsoft.CodeAnalysis.Scripting.ScriptOptions.Default.WithImports("System");
+        var option = ScriptOptions.Default.WithImports("System");
         MoveScriptX = CSharpScript.Create<float>(Game.Skin.Value.Play_FlyNotes.MoveScriptX[player], option, typeof(Skin.FlyNoteJson));
         MoveScriptY = CSharpScript.Create<float>(Game.Skin.Value.Play_FlyNotes.MoveScriptY[player], option, typeof(Skin.FlyNoteJson));
 
