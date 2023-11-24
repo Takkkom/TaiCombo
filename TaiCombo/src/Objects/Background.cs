@@ -20,18 +20,27 @@ class Background
     public void ClearIn(int player)
     {
         Up.ClearIn(player + 1);
+        Down?.ClearIn(player + 1);
+        Down_Clear?.ClearIn(player + 1);
     }
 
     public void ClearOut(int player)
     {
-        Up.ClearIn(player + 1);
+        Up.ClearOut(player + 1);
+        Down?.ClearOut(player + 1);
+        Down_Clear?.ClearOut(player + 1);
     }
 
-    public Background()
+    public Background(int playerCount)
     {
         Up = Game.Skin.Assets.Play_BG_Up["0"];
-        //Down = new("");
-        //Down_Clear = new("");
+        Up.SetPlayerCount(playerCount);
+
+        if (playerCount == 1)
+        {
+            Down = Game.Skin.Assets.Play_BG_Down["0"];
+            Down_Clear = Game.Skin.Assets.Play_BG_Down_Clear["0"];
+        }
     }
 
     public void Update()

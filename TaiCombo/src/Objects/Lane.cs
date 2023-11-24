@@ -68,6 +68,7 @@ class Lane
 
     public void Branch(BranchType branchType)
     {
+        if (PrevBranch == branchType) return;
         PrevBranch = CurrentBranch;
         CurrentBranch = branchType;
         BranchCounter = 0;

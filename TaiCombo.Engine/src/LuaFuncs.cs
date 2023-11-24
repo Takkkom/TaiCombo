@@ -21,14 +21,26 @@ public class LuaFuncs
         Sprites.Add(fileName, new Sprite($"{BaseDir}{truePath}"));
     }
 
-    public void DrawSprite(int x, int y, string fileName)
+    public void DrawSpriteOpacity(float x, float y, float opacity, string fileName)
+    {
+        Sprite sprite = Sprites[fileName];
+        DrawSpriteFull(x, y, 1, 1, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, 0, 1, 1, 1, opacity, "Left_Up", "Normal", fileName);
+    }
+
+    public void DrawSpriteBlendOpacity(float x, float y, float opacity, string blend, string fileName)
+    {
+        Sprite sprite = Sprites[fileName];
+        DrawSpriteFull(x, y, 1, 1, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, 0, 1, 1, 1, opacity, "Left_Up", blend, fileName);
+    }
+
+    public void DrawSprite(float x, float y, string fileName)
     {
         Sprite sprite = Sprites[fileName];
         DrawSpriteFull(x, y, 1, 1, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, 0, 1, 1, 1, 1, "Left_Up", "Normal", fileName);
     }
 
     public void DrawSpriteFull(
-        int x, int y, 
+        float x, float y, 
         float scaleX, float scaleY, 
         float rectX, float rectY, float rectWidth, float rectHeight, 
         bool flipX, bool flipY, 
@@ -98,5 +110,17 @@ public class LuaFuncs
         }
 
         sprite.Draw(x, y, scaleX, scaleY, new System.Drawing.RectangleF(rectX, rectY, rectWidth, rectHeight), flipX, flipY, rotation, new Struct.Color4(red, green, blue, alpha), drawOriginType, blendType);
+    }
+
+    public int GetSpriteWidth(string fileName)
+    {
+        Sprite sprite = Sprites[fileName];
+        return sprite.TextureSize.Width;
+    }
+
+    public int GetSpriteHeight(string fileName)
+    {
+        Sprite sprite = Sprites[fileName];
+        return sprite.TextureSize.Height;
     }
 }

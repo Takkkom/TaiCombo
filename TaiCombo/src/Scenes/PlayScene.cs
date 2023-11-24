@@ -122,6 +122,8 @@ class PlayScene : Scene
 
     private bool[] BranchHold = new bool[Game.MAXPLAYER];
 
+    private bool[] Cleared = new bool[Game.MAXPLAYER];
+
     private void Event(PlayEventType playEventType, int player)
     {
         switch(playEventType)
@@ -134,6 +136,16 @@ class PlayScene : Scene
             case PlayEventType.GoGoEnd:
             {
                 Lane[player].GoGoOut();
+            }
+            break;
+            case PlayEventType.ClearIn:
+            {
+                Background.ClearIn(player);
+            }
+            break;
+            case PlayEventType.ClearOut:
+            {
+                Background.ClearOut(player);
             }
             break;
         }
@@ -415,6 +427,23 @@ class PlayScene : Scene
         }
 
         UpdateScoreRank(player);
+
+        if (Cleared[player])
+        {
+            if (States[player].Gauge < GaugeHelper.ClearLine[GaugeType[player]])
+            {
+                Event(PlayEventType.ClearOut, player);
+                Cleared[player] = false;
+            }
+        }
+        else
+        {
+            if (States[player].Gauge >= GaugeHelper.ClearLine[GaugeType[player]])
+            {
+                Event(PlayEventType.ClearIn, player);
+                Cleared[player] = true;
+            }
+        }
 
         if (hit)
         {
@@ -762,7 +791,7 @@ class PlayScene : Scene
 
         LoadChart(ChartPath);
 
-        Background = new();
+        Background = new(PlayerCount);
 
         for(int player = 0; player < PlayerCount; player++)
         {

@@ -29,6 +29,11 @@ class PlayBG : LuaScript
         
     }
 
+    public void SetPlayerCount(int playerCount)
+    {
+        Script["playerCount"] = playerCount;
+    }
+
     public PlayBG(string fileName) : base(fileName)
     {
         LuaFuncClearIn = Script.GetFunction("clearIn");

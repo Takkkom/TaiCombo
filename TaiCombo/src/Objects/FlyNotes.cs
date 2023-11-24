@@ -38,7 +38,7 @@ class FlyNotes
     private Microsoft.CodeAnalysis.Scripting.Script<float> MoveScriptY;
 
     private const int MAXNOTECOUNT = 20;
-    private const int FRAMECOUNT = 60;
+    private const int FRAMECOUNT = 30;
     private float[] X = new float[FRAMECOUNT];
     private float[] Y = new float[FRAMECOUNT];
 
@@ -67,11 +67,11 @@ class FlyNotes
         MoveScriptX = CSharpScript.Create<float>(Game.Skin.Value.Play_FlyNotes.MoveScriptX[player], option, typeof(Skin.FlyNoteJson));
         MoveScriptY = CSharpScript.Create<float>(Game.Skin.Value.Play_FlyNotes.MoveScriptY[player], option, typeof(Skin.FlyNoteJson));
 
-        for(int i = 0; i < 60; i++)
+        for(int i = 0; i < FRAMECOUNT; i++)
         {
             async Task set()
             {
-                Game.Skin.Value.Play_FlyNotes.Value = i / 60.0f;
+                Game.Skin.Value.Play_FlyNotes.Value = i / (float)FRAMECOUNT;
                 X[i] = (await MoveScriptX.RunAsync(globals:Game.Skin.Value.Play_FlyNotes)).ReturnValue;
                 Y[i] = (await MoveScriptY.RunAsync(globals:Game.Skin.Value.Play_FlyNotes)).ReturnValue;
             }
