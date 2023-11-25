@@ -8,6 +8,18 @@ class PlayBG : LuaScript
 {
     private LuaFunction LuaFuncClearIn;
     private LuaFunction LuaFuncClearOut;
+    private LuaFunction LuaFuncMaxIn;
+    private LuaFunction LuaFuncMaxOut;
+
+    public void SetGauge(float[] gauge)
+    {
+        Script["gauge"] = gauge;
+    }
+
+    public void SetBPM(float[] bpm)
+    {
+        Script["bpm"] = bpm;
+    }
 
     public void ClearIn(int player)
     {
@@ -17,6 +29,16 @@ class PlayBG : LuaScript
     public void ClearOut(int player)
     {
         LuaFuncClearOut.Call(player);
+    }
+
+    public void MaxIn(int player)
+    {
+        LuaFuncMaxIn.Call(player);
+    }
+
+    public void MaxOut(int player)
+    {
+        LuaFuncMaxOut.Call(player);
     }
     
     public void GoGoIn()
@@ -34,10 +56,22 @@ class PlayBG : LuaScript
         Script["playerCount"] = playerCount;
     }
 
+    public void SetP1IsBlue(bool p1IsBlue)
+    {
+        Script["p1IsBlue"] = p1IsBlue;
+    }
+
     public PlayBG(string fileName) : base(fileName)
     {
         LuaFuncClearIn = Script.GetFunction("clearIn");
         LuaFuncClearOut = Script.GetFunction("clearOut");
+        LuaFuncMaxIn = Script.GetFunction("maxIn");
+        LuaFuncMaxOut = Script.GetFunction("maxOut");
+
+        SetGauge(new float[] { 0, 0 });
+        SetBPM(new float[] { 150, 150 });
+        SetPlayerCount(1);
+        SetP1IsBlue(false);
     }
 
     public override void Init()

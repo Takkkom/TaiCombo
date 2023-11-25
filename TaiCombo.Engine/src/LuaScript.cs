@@ -5,6 +5,7 @@ namespace TaiCombo.Engine;
 
 public class LuaScript : IDisposable
 {
+    private LuaFuncs Funcs;
     protected Lua Script;
 
     private LuaFunction LuaFuncLoadAssets;
@@ -18,7 +19,8 @@ public class LuaScript : IDisposable
         Script = new();
         Script.State.Encoding = Encoding.UTF8;
 
-        Script["func"] = new LuaFuncs(fileName);
+        Funcs = new LuaFuncs(fileName);
+        Script["func"] = Funcs;
         Script.DoFile(fileName);
 
         LuaFuncLoadAssets = Script.GetFunction("loadAssets");
@@ -47,6 +49,7 @@ public class LuaScript : IDisposable
 
     public void Dispose()
     {
+        Funcs.Dispose();
         LuaFuncLoadAssets.Dispose();
         LuaFuncInit.Dispose();
         LuaFuncUpdate.Dispose();

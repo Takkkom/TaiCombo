@@ -23,7 +23,7 @@ public class AngleContext : IGLContext
         else if (window.Native.Kind.HasFlag(NativeWindowFlags.X11))
         {
             windowHandle = (nint)window.Native.X11.Value.Window;
-            display = Egl.GetDisplay(window.Native.X11.Value.Display);
+            display = 0;
         }
         else if (window.Native.Kind.HasFlag(NativeWindowFlags.Cocoa))
         {

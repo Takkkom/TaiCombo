@@ -18,17 +18,19 @@ class StartupScene : Scene
         {
             Game.Skin.LoadAssets();
             GameEngine.SceneManager_.ChangeScene(new PlayScene(new () { 
-                { "PlayerCount", 2 },
-                //{ "ChartPath", "Songs/dummy.tja" },
+                { "PlayerCount", 1 },
+                { "ChartPath", "Songs/dummy.tja" },
                 //{ "Courses", new Plugin.Enums.CourseType[] { Plugin.Enums.CourseType.Edit, Plugin.Enums.CourseType.Edit } },
+                //{ "Courses", new Plugin.Enums.CourseType[] { Plugin.Enums.CourseType.Oni, Plugin.Enums.CourseType.Edit } },
                 { "Courses", new Plugin.Enums.CourseType[] { Plugin.Enums.CourseType.Oni, Plugin.Enums.CourseType.Oni } },
                 { "Options", new Options[] { 
                     new Options() { ScrollSpeed = 1.0f, Invisible = InvisibleType.None, Flip = false, Random = RandomType.None, Skippable = true, Offset = 0, NoVoice = NoVoiceType.None, HitSound = 0, ScoreType = ScoreType.Gen4, AutoPlay = true },
-                    new Options() { ScrollSpeed = 1.2f, Invisible = InvisibleType.SEOnly, Flip = true, Random = RandomType.Random, Skippable = true, Offset = 5, NoVoice = NoVoiceType.Combo, HitSound = 0, ScoreType = ScoreType.Gen4, AutoPlay = true }
+                    new Options() { ScrollSpeed = 1.0f, Invisible = InvisibleType.None, Flip = false, Random = RandomType.None, Skippable = true, Offset = 0, NoVoice = NoVoiceType.None, HitSound = 0, ScoreType = ScoreType.Gen4, AutoPlay = true }
                  } },
                 { "GaugeType", new GaugeType[] { (GaugeType)(-1), (GaugeType)(-1) } },
                 { "PlaySpeed", 1.2f },
-                { "GameMode", GameModeType.Play }
+                { "GameMode", GameModeType.Play },
+                { "RightSide", false }
             }));
             
             /*

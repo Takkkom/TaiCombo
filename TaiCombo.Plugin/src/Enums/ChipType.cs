@@ -41,5 +41,7 @@ public enum ChipType
     BranchHold,
 
     Line,
-    Line_Branched
+    Line_Branched,
+
+    End
 }

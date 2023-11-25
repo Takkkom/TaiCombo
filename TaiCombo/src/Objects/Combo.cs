@@ -9,6 +9,7 @@ namespace TaiCombo.Objects;
 class Combo
 {
     private int Player;
+    private int TaikoSide;
 
     private int Number;
 
@@ -43,9 +44,10 @@ class Combo
         CurrentState = States.Close;
     }
 
-    public Combo(int player)
+    public Combo(int player, int taikoSide)
     {
         Player = player;
+        TaikoSide = taikoSide;
     }
 
     public void Update()
@@ -115,11 +117,11 @@ class Combo
             case States.Draw:
             {
                 RectangleF rectangle = new(Game.Skin.Value.Play_Combo_Base.Width * 2, 0, Game.Skin.Value.Play_Combo_Base.Width, Game.Skin.Value.Play_Combo_Base.Height);
-                Game.Skin.Assets.Play_Combo_Base[Player].Draw(x, y, rectangle:rectangle);
+                Game.Skin.Assets.Play_Combo_Base[TaikoSide].Draw(x, y, rectangle:rectangle);
 
                 NumHelper.DrawNumber(Number, combo_Number.Pos[Player].X, combo_Number.Pos[Player].Y, 
                 combo_Number.Width, combo_Number.Height, combo_Number.Padding * scale,
-                scale, 1, Game.Skin.Assets.Play_Combo_Number[Player]);
+                scale, 1, Game.Skin.Assets.Play_Combo_Number[TaikoSide]);
 
                 Game.Skin.Assets.Play_Combo_Text.Draw(
                     comboText.X, comboText.Y, scale, 1.0f, drawOriginType:Engine.Enums.DrawOriginType.Center);
@@ -130,13 +132,13 @@ class Combo
                 float opacity = Math.Min(OpenCounter * 1.6f, 1);
                 int frame = OpenCounter > 0.75f ? 1 : 0;
                 RectangleF rectangle = new(Game.Skin.Value.Play_Combo_Base.Width * frame, 0, Game.Skin.Value.Play_Combo_Base.Width, Game.Skin.Value.Play_Combo_Base.Height);
-                Game.Skin.Assets.Play_Combo_Base[Player].Draw(x, y, rectangle:rectangle, color:new Color4(1, 1, 1, opacity));
+                Game.Skin.Assets.Play_Combo_Base[TaikoSide].Draw(x, y, rectangle:rectangle, color:new Color4(1, 1, 1, opacity));
 
                 float numOpacity = Math.Max((OpenCounter - 0.75f) * 4, 0);
                 float move = (1 - numOpacity) * 7;
                 NumHelper.DrawNumber(Number, combo_Number.Pos[Player].X + move, combo_Number.Pos[Player].Y, 
                 combo_Number.Width, combo_Number.Height, combo_Number.Padding * scale,
-                scale, 1, Game.Skin.Assets.Play_Combo_Number[Player], new Color4(1, 1, 1, numOpacity));
+                scale, 1, Game.Skin.Assets.Play_Combo_Number[TaikoSide], new Color4(1, 1, 1, numOpacity));
 
                 Game.Skin.Assets.Play_Combo_Text.Draw(
                     comboText.X + move, comboText.Y, scale, 1.0f, color:new Color4(1, 1, 1, numOpacity), drawOriginType:Engine.Enums.DrawOriginType.Center);
@@ -148,12 +150,12 @@ class Combo
                 float opacity = CloseCounter > 0.8f ? 1 - ((CloseCounter - 0.8f) * 5) : 1;
                 int frame = CloseCounter > 0.25f ? (CloseCounter > 0.8f ? 0 : 1) : 2;
                 RectangleF rectangle = new(Game.Skin.Value.Play_Combo_Base.Width * frame, 0, Game.Skin.Value.Play_Combo_Base.Width, Game.Skin.Value.Play_Combo_Base.Height);
-                Game.Skin.Assets.Play_Combo_Base[Player].Draw(x, y, rectangle:rectangle, color:new Color4(1, 1, 1, opacity));
+                Game.Skin.Assets.Play_Combo_Base[TaikoSide].Draw(x, y, rectangle:rectangle, color:new Color4(1, 1, 1, opacity));
 
                 float numOpacity = 1 - (CloseCounter * 1.6f);
                 NumHelper.DrawNumber(Number, combo_Number.Pos[Player].X, combo_Number.Pos[Player].Y, 
                 combo_Number.Width, combo_Number.Height, combo_Number.Padding * scale,
-                scale, 1, Game.Skin.Assets.Play_Combo_Number[Player], new Color4(1, 1, 1, numOpacity));
+                scale, 1, Game.Skin.Assets.Play_Combo_Number[TaikoSide], new Color4(1, 1, 1, numOpacity));
 
                 Game.Skin.Assets.Play_Combo_Text.Draw(
                     comboText.X, comboText.Y, scale, 1.0f, color:new Color4(1, 1, 1, numOpacity), drawOriginType:Engine.Enums.DrawOriginType.Center);

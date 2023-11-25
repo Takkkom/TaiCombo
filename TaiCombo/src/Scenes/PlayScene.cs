@@ -38,6 +38,7 @@ class PlayScene : Scene
     private GaugeType[] GaugeType = new GaugeType[Game.MAXPLAYER];
     private float PlaySpeed;
     private GameModeType GameMode;
+    private bool RightSide;
 
     private float[] NotePixelOffset = new float[Game.MAXPLAYER];
 
@@ -59,6 +60,7 @@ class PlayScene : Scene
             BranchHold[player] = false;
             
             NoteHelper.BranchChips(Chips[player], 0, BranchType.Normal);
+            Event(PlayEventType.ChangeBPM, player);
         }
     }
 
@@ -101,6 +103,8 @@ class PlayScene : Scene
     private Balloon[] Balloon = new Balloon[Game.MAXPLAYER];
 
     private ScoreRank[] ScoreRank = new ScoreRank[Game.MAXPLAYER];
+    
+    private EndAnime EndAnime;
 
     private PlayStates[] States = new PlayStates[Game.MAXPLAYER];
 
@@ -124,10 +128,19 @@ class PlayScene : Scene
 
     private bool[] Cleared = new bool[Game.MAXPLAYER];
 
+    private bool[] Maxed = new bool[Game.MAXPLAYER];
+
+    private float[] BPM = new float[Game.MAXPLAYER];
+
     private void Event(PlayEventType playEventType, int player)
     {
         switch(playEventType)
         {
+            case PlayEventType.ChangeBPM:
+            {
+                Background.SetBPM(BPM);
+            }
+            break;
             case PlayEventType.GoGoStart:
             {
                 Lane[player].GoGoIn();
@@ -146,6 +159,39 @@ class PlayScene : Scene
             case PlayEventType.ClearOut:
             {
                 Background.ClearOut(player);
+            }
+            break;
+            case PlayEventType.SoulIn:
+            {
+                Background.MaxIn(player);
+            }
+            break;
+            case PlayEventType.SoulOut:
+            {
+                Background.MaxOut(player);
+            }
+            break;
+            case PlayEventType.End:
+            {
+                if (Cleared[player])
+                {
+                    if (States[player].Ok == 0 && States[player].Miss == 0)
+                    {
+                        EndAnime.PlayAnime(ClearType.AllPerfect, player);
+                    }
+                    else if (States[player].Ok == 0)
+                    {
+                        EndAnime.PlayAnime(ClearType.FullCombo, player);
+                    }
+                    else
+                    {
+                        EndAnime.PlayAnime(ClearType.Clear, player);
+                    }
+                }
+                else 
+                {
+                    EndAnime.PlayAnime(ClearType.None, player);
+                }
             }
             break;
         }
@@ -204,7 +250,6 @@ class PlayScene : Scene
                 Chips[player].Add(chip);
             }
         }
-        Reset();
     }
 
     private void UpdateScoreRank(int player)
@@ -445,6 +490,23 @@ class PlayScene : Scene
             }
         }
 
+        if (Maxed[player])
+        {
+            if (States[player].Gauge < 100)
+            {
+                Event(PlayEventType.SoulOut, player);
+                Maxed[player] = false;
+            }
+        }
+        else
+        {
+            if (States[player].Gauge >= 100)
+            {
+                Event(PlayEventType.SoulIn, player);
+                Maxed[player] = true;
+            }
+        }
+
         if (hit)
         {
             switch(chip.ChipType)
@@ -493,7 +555,7 @@ class PlayScene : Scene
                 if (NoteHelper.GetHit(chip.ChipType, hitType) && NoteHelper.IsHittableNote(chip.ChipType) && !chip.Hit && chip.Active)
                 {
                     long nowTime = chip.Time - NowTime;
-                    JudgeType judge =  NoteHelper.GetJudge(Math.Abs(nowTime), JudgeZones[player]); 
+                    JudgeType judge = Options[player].AutoPlay ? JudgeType.Perfect : NoteHelper.GetJudge(Math.Abs(nowTime), JudgeZones[player]); 
 
                     if (judge != JudgeType.None)
                     {
@@ -715,6 +777,14 @@ class PlayScene : Scene
                 chip.Over = true;
             }
             break;
+            case ChipType.BPMChange:
+            if (nowTime < 0 && !chip.Over)
+            {
+                BPM[player] = chip.BPM * PlaySpeed;
+                Event(PlayEventType.ChangeBPM, player);
+                chip.Over = true;
+            }
+            break;
             case ChipType.GoGoStart:
             if (nowTime < 0 && !chip.Over)
             {
@@ -763,6 +833,13 @@ class PlayScene : Scene
                 chip.Over = true;
             }
             break;
+            case ChipType.End:
+            if (nowTime < 0 && !chip.Over && chip.Active)
+            {
+                Event(PlayEventType.End, player);
+                chip.Over = true;
+            }
+            break;
             default:
             if (nowTime < 0 && !chip.Over)
             {
@@ -782,6 +859,7 @@ class PlayScene : Scene
         GaugeType = (GaugeType[])args["GaugeType"];
         PlaySpeed = (float)args["PlaySpeed"];
         GameMode = (GameModeType)args["GameMode"];
+        RightSide = (bool)args["RightSide"];
 
         for(int player = 0; player < PlayerCount; player++)
         {
@@ -791,10 +869,12 @@ class PlayScene : Scene
 
         LoadChart(ChartPath);
 
-        Background = new(PlayerCount);
+        Background = new(PlayerCount, RightSide);
+        EndAnime = new(GameMode, PlayerCount);
 
         for(int player = 0; player < PlayerCount; player++)
         {
+            BPM[player] = Chips[player][0].BPM * PlaySpeed;
             switch(GameMode)
             {
                 case GameModeType.Play:
@@ -835,7 +915,7 @@ class PlayScene : Scene
                 break;
             }
 
-            int taikoSide = player;
+            int taikoSide = RightSide ? 1 : player;
             TaikoUI[player] = new(player, taikoSide, (int)Courses[player], Options[player]);
             Lane[player] = new(player, Branchable[player]);
             Gauge[player] = new(GaugeType[player], player, taikoSide);
@@ -843,20 +923,76 @@ class PlayScene : Scene
             JudgeAnimes[player] = new(player);
             Rainbow[player] = new(player);
             FlyNotes[player] = new(player);
-            Combo[player] = new(player);
+            Combo[player] = new(player, taikoSide);
             Roll[player] = new(player);
             Balloon[player] = new(player);
             ScoreRank[player] = new(player);
             JudgeZones[player] = NoteHelper.JudgeZones[Courses[player]];
             AddScores[player] = ScoreHelper.GetAddScores(Chips[player], ScoreType.Gen4);
             AddGauges[player] = GaugeHelper.GetAddGauge(Chips[player], Courses[player], GaugeType[player], Chart.Courses[Courses[player]].Level);
+            
+            Event(PlayEventType.ChangeBPM, player);
         }
 
         NowTime = -1500000;
     }
 
+    private void DrawNotes()
+    {
+        for(int player = 0; player < PlayerCount; player++)
+        {
+            Vector2D<float> target = new Vector2D<float>(Game.Skin.Value.Play_Notes.Pos[player].X, Game.Skin.Value.Play_Notes.Pos[player].Y);
+            Vector2D<float> setarget = new Vector2D<float>(Game.Skin.Value.Play_SENotes.Pos[player].X, Game.Skin.Value.Play_SENotes.Pos[player].Y);
+
+            System.Drawing.RectangleF rectangle = new System.Drawing.RectangleF(0, 0, Game.Skin.Value.Play_Notes.Width, Game.Skin.Value.Play_Notes.Height);
+            Game.Skin.Assets.Play_Notes_Target.Draw(target.X, target.Y, rectangle:rectangle);
+            
+            Lane[player].DrawAfterTarget();
+            HitExplosion[player].DrawBeforTaikoBG();
+            
+            target.X += NotePixelOffset[player];
+            setarget.X += NotePixelOffset[player];
+
+            for(int i = Chips[player].Count - 1; i >= 0; i--)
+            {
+                var chip = Chips[player][i];
+                if ((chip.IsNote || chip.ChipType == ChipType.Line || chip.ChipType == ChipType.Line_Branched) && !chip.Hit && chip.Active)
+                {
+                    Vector2D<float> pos = chip.GetNotePosition() * Game.Skin.Value.Play_Notes.Padding * Options[player].ScrollSpeed;
+                    Vector2D<float> notepos = target + pos;
+                    Vector2D<float> senotepos = setarget + pos;
+                    
+                    if (chip.ChipType == ChipType.Line)
+                    {
+                        Game.Skin.Assets.Play_Notes_Line.Draw(notepos.X + (Game.Skin.Value.Play_Notes.Width / 2.0f), notepos.Y);
+                    }
+                    else if (chip.ChipType == ChipType.Line_Branched)
+                    {
+                        Game.Skin.Assets.Play_Notes_Line_Branched.Draw(notepos.X + (Game.Skin.Value.Play_Notes.Width / 2.0f), notepos.Y);
+                    }
+                    else 
+                    {
+                        switch(Options[player].Invisible)
+                        {
+                            case InvisibleType.None:
+                            NoteHelper.DrawNote(notepos, chip.ChipType, Game.Skin.Value.Play_Notes.Width, Game.Skin.Value.Play_Notes.Height, NoteFrame[player], NoteAnimeCounter[player], player);
+                            NoteHelper.DrawSENote(senotepos, chip.SENoteType, Game.Skin.Value.Play_SENotes.Width, Game.Skin.Value.Play_SENotes.Height, player);
+                            break;
+                            case InvisibleType.SEOnly:
+                            NoteHelper.DrawSENote(senotepos, chip.SENoteType, Game.Skin.Value.Play_SENotes.Width, Game.Skin.Value.Play_SENotes.Height, player);
+                            break;
+                            case InvisibleType.Full:
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public override void Activate()
     {
+        Reset();
         Start();
 
         
@@ -896,6 +1032,28 @@ class PlayScene : Scene
         {
             NowTime = NowTime + (long)(GameEngine.Time_.DeltaTime * 1000000);
         }
+        /*
+        else if (GameEngine.Input.GetKeyPressing(Silk.NET.Input.Key.Number1))
+        {
+            EndAnime.PlayAnime(ClearType.None, 0);
+            EndAnime.PlayAnime(ClearType.None, 1);
+        }
+        else if (GameEngine.Input.GetKeyPressing(Silk.NET.Input.Key.Number2))
+        {
+            EndAnime.PlayAnime(ClearType.Clear, 0);
+            EndAnime.PlayAnime(ClearType.Clear, 1);
+        }
+        else if (GameEngine.Input.GetKeyPressing(Silk.NET.Input.Key.Number3))
+        {
+            EndAnime.PlayAnime(ClearType.FullCombo, 0);
+            EndAnime.PlayAnime(ClearType.FullCombo, 1);
+        }
+        else if (GameEngine.Input.GetKeyPressing(Silk.NET.Input.Key.Number4))
+        {
+            EndAnime.PlayAnime(ClearType.AllPerfect, 0);
+            EndAnime.PlayAnime(ClearType.AllPerfect, 1);
+        }
+        */
         
         if (Playing)
         {
@@ -915,7 +1073,10 @@ class PlayScene : Scene
             PlayingBGM = false;
         }
 
+        Background.SetGauge(new float[] { States[0].Gauge, States[1].Gauge } );
         Background.Update();
+
+        EndAnime.Update();
 
         for(int player = 0; player < PlayerCount; player++)
         {
@@ -1047,54 +1208,12 @@ class PlayScene : Scene
         {
             Lane[player].Draw();
             Gauge[player].Draw(Game.Skin.Value.Play_Gauge.Pos[player].X, Game.Skin.Value.Play_Gauge.Pos[player].Y, 1.0f);
-            
-            Vector2D<float> target = new Vector2D<float>(Game.Skin.Value.Play_Notes.Pos[player].X, Game.Skin.Value.Play_Notes.Pos[player].Y);
-            Vector2D<float> setarget = new Vector2D<float>(Game.Skin.Value.Play_SENotes.Pos[player].X, Game.Skin.Value.Play_SENotes.Pos[player].Y);
+        }
 
-            System.Drawing.RectangleF rectangle = new System.Drawing.RectangleF(0, 0, Game.Skin.Value.Play_Notes.Width, Game.Skin.Value.Play_Notes.Height);
-            Game.Skin.Assets.Play_Notes_Target.Draw(target.X, target.Y, rectangle:rectangle);
-            
-            Lane[player].DrawAfterTarget();
-            HitExplosion[player].DrawBeforTaikoBG();
-            
-            target.X += NotePixelOffset[player];
-            setarget.X += NotePixelOffset[player];
+        DrawNotes();
 
-            for(int i = Chips[player].Count - 1; i >= 0; i--)
-            {
-                var chip = Chips[player][i];
-                if ((chip.IsNote || chip.ChipType == ChipType.Line || chip.ChipType == ChipType.Line_Branched) && !chip.Hit && chip.Active)
-                {
-                    Vector2D<float> pos = chip.GetNotePosition() * Game.Skin.Value.Play_Notes.Padding * Options[player].ScrollSpeed;
-                    Vector2D<float> notepos = target + pos;
-                    Vector2D<float> senotepos = setarget + pos;
-                    
-                    if (chip.ChipType == ChipType.Line)
-                    {
-                        Game.Skin.Assets.Play_Notes_Line.Draw(notepos.X + (Game.Skin.Value.Play_Notes.Width / 2.0f), notepos.Y);
-                    }
-                    else if (chip.ChipType == ChipType.Line_Branched)
-                    {
-                        Game.Skin.Assets.Play_Notes_Line_Branched.Draw(notepos.X + (Game.Skin.Value.Play_Notes.Width / 2.0f), notepos.Y);
-                    }
-                    else 
-                    {
-                        switch(Options[player].Invisible)
-                        {
-                            case InvisibleType.None:
-                            NoteHelper.DrawNote(notepos, chip.ChipType, Game.Skin.Value.Play_Notes.Width, Game.Skin.Value.Play_Notes.Height, NoteFrame[player], NoteAnimeCounter[player], player);
-                            NoteHelper.DrawSENote(senotepos, chip.SENoteType, Game.Skin.Value.Play_SENotes.Width, Game.Skin.Value.Play_SENotes.Height, player);
-                            break;
-                            case InvisibleType.SEOnly:
-                            NoteHelper.DrawSENote(senotepos, chip.SENoteType, Game.Skin.Value.Play_SENotes.Width, Game.Skin.Value.Play_SENotes.Height, player);
-                            break;
-                            case InvisibleType.Full:
-                            break;
-                        }
-                    }
-                }
-            }
-
+        for(int player = 0; player < PlayerCount; player++)
+        {
             TaikoUI[player].Draw();
             HitExplosion[player].DrawAfterTaikoBG();
             JudgeAnimes[player].Draw();
@@ -1105,6 +1224,8 @@ class PlayScene : Scene
             Balloon[player].Draw();
             ScoreRank[player].Draw();
         }
+
+        EndAnime.Draw();
 
         base.Draw();
     }

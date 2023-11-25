@@ -289,6 +289,12 @@ class SkinConfigValue
         Padding = 80
     };
 
+    public PosJson[] Play_Roll_Text { get; set; } = new PosJson[] 
+    { 
+        new PosJson() { X = 567, Y = 162 }, 
+        new PosJson() { X = 567, Y = 970 } 
+    };
+
     public PosJson[] Play_Balloon_Base { get; set; } = new PosJson[] 
     { 
         new PosJson() { X = 580, Y = 43 }, 

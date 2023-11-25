@@ -4,7 +4,7 @@ using TaiCombo.Engine.Enums;
 
 namespace TaiCombo.Engine;
 
-public class LuaFuncs
+public class LuaFuncs : IDisposable
 {
     private List<Sprite> Sprites = new();
 
@@ -39,6 +39,30 @@ public class LuaFuncs
     {
         Sprite sprite = Sprites[index];
         DrawSpriteFull(x, y, 1, 1, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, 0, 1, 1, 1, 1, "Left_Up", "Normal", index);
+    }
+
+    public void DrawSpriteOrigin(float x, float y, string drawOrigin, int index)
+    {
+        Sprite sprite = Sprites[index];
+        DrawSpriteFull(x, y, 1, 1, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, 0, 1, 1, 1, 1, drawOrigin, "Normal", index);
+    }
+
+    public void DrawSpriteOriginScale(float x, float y, float scaleX, float scaleY, string drawOrigin, int index)
+    {
+        Sprite sprite = Sprites[index];
+        DrawSpriteFull(x, y, scaleX, scaleY, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, 0, 1, 1, 1, 1, drawOrigin, "Normal", index);
+    }
+
+    public void DrawSpriteOriginScaleAlpha(float x, float y, float scaleX, float scaleY, float alpha, string drawOrigin, int index)
+    {
+        Sprite sprite = Sprites[index];
+        DrawSpriteFull(x, y, scaleX, scaleY, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, 0, 1, 1, 1, alpha, drawOrigin, "Normal", index);
+    }
+
+    public void DrawSpriteOriginRotation(float x, float y, float rotation, string drawOrigin, int index)
+    {
+        Sprite sprite = Sprites[index];
+        DrawSpriteFull(x, y, 1, 1, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, rotation, 1, 1, 1, 1, drawOrigin, "Normal", index);
     }
 
     public void DrawSpriteFull(
@@ -124,5 +148,14 @@ public class LuaFuncs
     {
         Sprite sprite = Sprites[index];
         return sprite.TextureSize.Height;
+    }
+
+    public void Dispose()
+    {
+        for(int i = 0; i < Sprites.Count; i++)
+        {
+            Sprites[i].Dispose();
+        }
+        Sprites.Clear();
     }
 }

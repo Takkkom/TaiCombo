@@ -23,7 +23,6 @@ class TJALoader : IChartInfo
     private List<int> Balloons = new();
     private List<IChip> Chips = new();
     private List<TJAChip> CurrentChips = new();
-    private TJAScrollType InitScrollType;
 
     private CourseType CurrentCourseType = CourseType.Easy;
 
@@ -203,6 +202,14 @@ class TJALoader : IChartInfo
         }
         else if (text == "#END")
         {
+            TJAChip chip = new()
+            {
+                Time = State.NowTime,
+                ChipType = ChipType.End
+            };
+
+            Chips.Add(chip);
+
             ChartHelper.PostProcess(Chips);
             LoadingChart = false;
         }

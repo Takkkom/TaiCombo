@@ -103,5 +103,8 @@ class Roll
         NumHelper.DrawNumber(Number, Game.Skin.Value.Play_Roll_Number.Pos[Player].X, Game.Skin.Value.Play_Roll_Number.Pos[Player].Y - ((Game.Skin.Value.Play_Taiko_Combo.Height / 2) * (numScale - 1)), 
         Game.Skin.Value.Play_Roll_Number.Width, Game.Skin.Value.Play_Roll_Number.Height, Game.Skin.Value.Play_Roll_Number.Padding, 
         1.0f, numScale, Game.Skin.Assets.Play_Roll_Number, numColor);
+        
+        Game.Skin.Assets.Play_Roll_Text.Draw(Game.Skin.Value.Play_Roll_Text[Player].X, Game.Skin.Value.Play_Roll_Text[Player].Y, color:numColor);
+            
     }
 }

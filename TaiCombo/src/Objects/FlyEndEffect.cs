@@ -58,6 +58,37 @@ class FlyEndEffect
             float x = Game.Skin.Value.Play_FlyNotes.End[Player].X;
             float y = Game.Skin.Value.Play_FlyNotes.End[Player].Y;
 
+            if (flyEndInfo.Value < 0.025f)
+            {
+                Game.Skin.Assets.Play_FlyNotes_Firework_Alt.Draw(Game.Skin.Value.Play_FlyEndEffect_Firework.Pos[Player].X, Game.Skin.Value.Play_FlyEndEffect_Firework.Pos[Player].Y, drawOriginType:DrawOriginType.Center);
+            }
+            else
+            {
+                float value = (flyEndInfo.Value - 0.025f);
+                float rotation = -(value * 1.4f) * MathF.PI;
+                float scale = 0.75f + value;
+
+                Color3 beginColor = Game.Skin.Value.Play_FlyEndEffect_Firework.BeginColor[Player];
+                Color3 endColor = Game.Skin.Value.Play_FlyEndEffect_Firework.EndColor[Player];
+
+                float opacity = 1;
+                if (value > 0.2f)
+                {
+                    float value2 = (value - 0.2f) * 6;
+                    opacity = 1 - (value2 * 2);
+                    rotation -= value2 / 4.0f * MathF.PI;
+                    scale += value2;
+                }
+
+                float gradValue = Math.Min(value / 0.2f, 1);
+
+                Color4 fireworkColor = new (beginColor.R + ((endColor.R - beginColor.R) * gradValue), 
+                beginColor.G + ((endColor.G - beginColor.G) * gradValue), 
+                beginColor.B + ((endColor.B - beginColor.B) * gradValue), opacity);
+
+                Game.Skin.Assets.Play_FlyNotes_Firework.Draw(Game.Skin.Value.Play_FlyEndEffect_Firework.Pos[Player].X, Game.Skin.Value.Play_FlyEndEffect_Firework.Pos[Player].Y, color:fireworkColor, rotation:rotation, scaleX:scale, scaleY:scale, drawOriginType:DrawOriginType.Center);
+            }
+
             float yellowOpacity;
             float whiteOpacity;
 
@@ -112,36 +143,6 @@ class FlyEndEffect
                 break;
             }
 
-            if (flyEndInfo.Value < 0.025f)
-            {
-                Game.Skin.Assets.Play_FlyNotes_Firework_Alt.Draw(Game.Skin.Value.Play_FlyEndEffect_Firework.Pos[Player].X, Game.Skin.Value.Play_FlyEndEffect_Firework.Pos[Player].Y, drawOriginType:DrawOriginType.Center);
-            }
-            else
-            {
-                float value = (flyEndInfo.Value - 0.025f);
-                float rotation = -(value * 1.4f) * MathF.PI;
-                float scale = 0.75f + value;
-
-                Color3 beginColor = Game.Skin.Value.Play_FlyEndEffect_Firework.BeginColor[Player];
-                Color3 endColor = Game.Skin.Value.Play_FlyEndEffect_Firework.EndColor[Player];
-
-                float opacity = 1;
-                if (value > 0.2f)
-                {
-                    float value2 = (value - 0.2f) * 6;
-                    opacity = 1 - (value2 * 2);
-                    rotation -= value2 / 4.0f * MathF.PI;
-                    scale += value2;
-                }
-
-                float gradValue = Math.Min(value / 0.2f, 1);
-
-                Color4 fireworkColor = new (beginColor.R + ((endColor.R - beginColor.R) * gradValue), 
-                beginColor.G + ((endColor.G - beginColor.G) * gradValue), 
-                beginColor.B + ((endColor.B - beginColor.B) * gradValue), opacity);
-
-                Game.Skin.Assets.Play_FlyNotes_Firework.Draw(Game.Skin.Value.Play_FlyEndEffect_Firework.Pos[Player].X, Game.Skin.Value.Play_FlyEndEffect_Firework.Pos[Player].Y, color:fireworkColor, rotation:rotation, scaleX:scale, scaleY:scale, drawOriginType:DrawOriginType.Center);
-            }
         }
     }
 }
