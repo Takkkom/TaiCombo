@@ -132,6 +132,41 @@ class PlayScene : Scene
 
     private float[] BPM = new float[Game.MAXPLAYER];
 
+    private List<Action>[] RollProcesss = new List<Action>[Game.MAXPLAYER] { new List<Action>(), new List<Action>() };
+
+    private void StartAutoRoll(int player)
+    {
+        Task.Run(() => 
+        {
+            if (CurrentRollChip[player] == null) return;
+            bool balloon = CurrentRollChip[player].ChipType == ChipType.Roll_Balloon_Start || CurrentRollChip[player].ChipType == ChipType.Roll_Kusudama_Start;
+
+            int interval;
+            if (balloon)
+            {
+                interval = (int)Math.Ceiling(CurrentRollChip[player].RollLength / Math.Max(CurrentRollChip[player].BalloonCount, 1) / PlaySpeed / 1000);
+            }
+            else 
+            {
+                interval = 1000 / 16;
+            }
+
+            while(CurrentRollChip[player] != null)
+            {
+                if (Playing)
+                {
+                    RollProcesss[player].Add(() => 
+                    {
+                        HitTaiko(player, TaikoType.DonRight);
+                    });
+                }
+
+                if (CurrentRollChip[player] == null) break;
+                Thread.Sleep(interval);
+            }
+        });
+    }
+
     private void Event(PlayEventType playEventType, int player)
     {
         switch(playEventType)
@@ -436,6 +471,7 @@ class PlayScene : Scene
             break;
             case JudgeType.BalloonBreak:
             {
+                CurrentRollChip[player] = null;
                 States[player].Roll++;
                 States[player].Score += AddScores[player].Balloon_Broke;
                 BranchStates[player].Roll++;
@@ -700,6 +736,7 @@ class PlayScene : Scene
             if (nowTime < 0 && !chip.Over)
             {
                 CurrentRollChip[player] = chip;
+                StartAutoRoll(player);
 
                 chip.Over = true;
             }
@@ -708,6 +745,7 @@ class PlayScene : Scene
             if (nowTime < 0 && !chip.Over)
             {
                 CurrentRollChip[player] = chip;
+                StartAutoRoll(player);
 
                 chip.Over = true;
             }
@@ -716,6 +754,7 @@ class PlayScene : Scene
             if (nowTime < 0 && !chip.Over)
             {
                 CurrentRollChip[player] = chip;
+                StartAutoRoll(player);
 
                 chip.Over = true;
             }
@@ -724,6 +763,7 @@ class PlayScene : Scene
             if (nowTime < 0 && !chip.Over)
             {
                 CurrentRollChip[player] = chip;
+                StartAutoRoll(player);
 
                 chip.Over = true;
             }
@@ -732,6 +772,7 @@ class PlayScene : Scene
             if (nowTime < 0 && !chip.Over)
             {
                 CurrentRollChip[player] = chip;
+                StartAutoRoll(player);
 
                 chip.Over = true;
             }
@@ -740,6 +781,7 @@ class PlayScene : Scene
             if (nowTime < 0 && !chip.Over)
             {
                 CurrentRollChip[player] = chip;
+                StartAutoRoll(player);
 
                 chip.Over = true;
             }
@@ -748,6 +790,7 @@ class PlayScene : Scene
             if (nowTime < 0 && !chip.Over)
             {
                 CurrentRollChip[player] = chip;
+                StartAutoRoll(player);
 
                 chip.Over = true;
             }
@@ -756,6 +799,7 @@ class PlayScene : Scene
             if (nowTime < 0 && !chip.Over)
             {
                 CurrentRollChip[player] = chip;
+                StartAutoRoll(player);
 
                 chip.Over = true;
             }
@@ -1082,9 +1126,16 @@ class PlayScene : Scene
         {
             if (Options[player].AutoPlay)
             {
+                /*
                 if (Playing && CurrentRollChip[player] != null)
                 {
                     HitTaiko(player, TaikoType.DonRight);
+                }
+                */
+                if (RollProcesss[player].Count >= 1) 
+                {
+                    RollProcesss[player][0]?.Invoke(); 
+                    RollProcesss[player].RemoveAt(0);
                 }
             }
             else
@@ -1180,7 +1231,7 @@ class PlayScene : Scene
 
                 if (true) //
                 {
-                    if (Playing && NoteHelper.IsHittableNote(chip.ChipType) && !chip.Miss && !chip.Hit && nowTime < 0 && judge == JudgeType.None)
+                    if (Playing && NoteHelper.IsHittableNote(chip.ChipType) && !chip.Miss && !chip.Hit && chip.Active && nowTime < 0 && judge == JudgeType.None)
                     {
                         Judge(player, chip, JudgeType.Miss, false, HitType.Don);
                         chip.Miss = true;

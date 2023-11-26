@@ -14,8 +14,11 @@ class EndAnime
 
     private ClearType[] ClearTypes = new ClearType[Game.MAXPLAYER];
 
+    private bool Playing;
+
     public void PlayAnime(ClearType clearType, int player)
     {
+        Playing = true;
         ClearTypes[player] = clearType;
         switch (clearType)
         {
@@ -57,6 +60,7 @@ class EndAnime
 
     public void Update()
     {
+        if (!Playing) return; 
         Game.Skin.Assets.Play_EndAnime_Failed?.Update();
         Game.Skin.Assets.Play_EndAnime_Clear?.Update();
         Game.Skin.Assets.Play_EndAnime_FullCombo?.Update();
@@ -65,6 +69,7 @@ class EndAnime
 
     public void Draw()
     {
+        if (!Playing) return;
         Game.Skin.Assets.Play_EndAnime_Failed?.Draw();
         Game.Skin.Assets.Play_EndAnime_Clear?.Draw();
         Game.Skin.Assets.Play_EndAnime_FullCombo?.Draw();

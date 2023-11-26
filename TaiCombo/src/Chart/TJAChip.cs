@@ -83,14 +83,12 @@ class TJAChip : IChip
     private float NowHBTime;
     private static float CurrentBPM = 0;
     private static float CurrentTimeGap = 0;
-    private static float CurrentDelay = 0;
-    private static float CurrentDelayTotal = 0;
+    private static long CurrentDelayTotal = 0;
 
     public void InitHBValue()
     {
         CurrentBPM = BPM;
         CurrentTimeGap = 0;
-        CurrentDelay = 0;
         CurrentDelayTotal = 0;
     }
 
@@ -156,25 +154,24 @@ class TJAChip : IChip
 
         if (ChipType == ChipType.Delay)
         {
-            if (Delay > 0)
+            int delay = (int)(Delay * 1000000);
+            if (delay > 0)
             {
-                float prevDelay = CurrentDelay;
-                CurrentDelay = Delay * 1000000;
                 if (NowTime < 0)
                 {
-                    if (NowTime > -CurrentDelay)
+                    if (NowTime > -delay)
                     {
-                        CurrentDelayTotal = NowTime - prevDelay;
+                        CurrentDelayTotal += NowTime;
                     }
                     else 
                     {
-                        CurrentDelayTotal = -CurrentDelay - prevDelay;
+                        CurrentDelayTotal += -delay;
                     }
                 }
             }
             else 
             {
-                //CurrentDelayTotal = -CurrentDelay - prevDelay;
+                CurrentDelayTotal -= delay;
             }
         }
 

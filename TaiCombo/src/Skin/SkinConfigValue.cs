@@ -1,4 +1,5 @@
 using TaiCombo.Common;
+using TaiCombo.Enums;
 
 
 namespace TaiCombo.Skin;
@@ -54,6 +55,22 @@ class SkinConfigValue
         Pos = new PosJson[] { new PosJson() { X = 1051, Y = -15 }, new PosJson() { X = 1051, Y = -10 } },
         Width = 90,
         Height = 90
+    };
+
+    public Dictionary<string, PlayBGJson> Play_Background_Normal = new()
+    {
+        {
+            "Default",
+            new PlayBGJson()
+            {
+                Up = new string[] { "0" },
+                Down = new string[] { "0" },
+                Down_Clear = new string[] { "0" },
+                Footer = new string[] { "0", "1", "2" },
+                Dancer = new string[] { "0" },
+                Mob = new string[] { "0" },
+            }
+        }
     };
 
     public PosJson[] Play_Lane_Frame { get; set; } = new PosJson[]

@@ -504,7 +504,7 @@ class TJALoader : IChartInfo
                                 State.Delay += chip.Delay;
                                 if (chip.Delay < 0)
                                 {
-                                    State.NowHBTime += (long)(chip.Delay * 4600.0f * chip.BPM);
+                                    //State.NowHBTime += (long)(chip.Delay * 4600.0f * chip.BPM / (chip.Measure.Item1 / chip.Measure.Item2));
                                 }
                             }
                             break;

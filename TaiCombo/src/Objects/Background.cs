@@ -71,25 +71,26 @@ class Background
 
     public Background(int playerCount, bool rightSide)
     {
-        Up = Game.Skin.Assets.Play_BG_Up["0"];
+        var bg = Game.Skin.Value.Play_Background_Normal["Default"];
+        Up = Game.Skin.Assets.Play_BG_Up[bg.Up[Random.Shared.Next(0, bg.Up.Length)]];
         Up.SetPlayerCount(playerCount);
         Up.SetP1IsBlue(rightSide);
         Up.Init();
 
         if (playerCount == 1)
         {
-            Down = Game.Skin.Assets.Play_BG_Down["0"];
+            Down = Game.Skin.Assets.Play_BG_Down[bg.Down[Random.Shared.Next(0, bg.Down.Length)]];
             Down.Init();
 
-            Down_Clear = Game.Skin.Assets.Play_BG_Down_Clear["0"];
+            Down_Clear = Game.Skin.Assets.Play_BG_Down_Clear[bg.Down_Clear[Random.Shared.Next(0, bg.Down_Clear.Length)]];
             Down_Clear.Init();
 
-            Dancer = Game.Skin.Assets.Play_BG_Dancer["0"];
+            Dancer = Game.Skin.Assets.Play_BG_Dancer[bg.Dancer[Random.Shared.Next(0, bg.Dancer.Length)]];
             Dancer.Init();
 
-            Footer = Game.Skin.Assets.Play_BG_Footer["0"];
+            Footer = Game.Skin.Assets.Play_BG_Footer[bg.Footer[Random.Shared.Next(0, bg.Footer.Length)]];
 
-            Mob = Game.Skin.Assets.Play_BG_Mob["0"];
+            Mob = Game.Skin.Assets.Play_BG_Mob[bg.Mob[Random.Shared.Next(0, bg.Mob.Length)]];
             Mob.Init();
         }
     }
