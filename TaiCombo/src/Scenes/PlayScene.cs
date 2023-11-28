@@ -10,6 +10,7 @@ using TaiCombo.Structs;
 using TaiCombo.Plugin.Enums;
 using TaiCombo.Skin;
 using TaiCombo.Plugin.Struct;
+using TaiCombo.Chara;
 
 namespace TaiCombo.Scenes;
 
@@ -46,6 +47,8 @@ class PlayScene : Scene
     {
         for(int player = 0; player < PlayerCount; player++)
         {
+            BalloonMode[player] = false;
+            BPM[player] = Chips[player][0].BPM * PlaySpeed;
             for(int i = 0; i < Chips[player].Count; i++)
             {
                 IChip chip = Chips[player][i];
@@ -82,6 +85,10 @@ class PlayScene : Scene
 
     private Background Background;
 
+    private GoGoSplash GoGoSplash;
+
+    private IPlayerChara[] Charas = new IPlayerChara[Game.MAXPLAYER];
+
     private Lane[] Lane = new Lane[Game.MAXPLAYER];
 
     private Gauge[] Gauge = new Gauge[Game.MAXPLAYER];
@@ -106,6 +113,8 @@ class PlayScene : Scene
     
     private EndAnime EndAnime;
 
+    private PlayTitle Title;
+
     private PlayStates[] States = new PlayStates[Game.MAXPLAYER];
 
     private BranchStates[] BranchStates = new BranchStates[Game.MAXPLAYER];
@@ -115,6 +124,8 @@ class PlayScene : Scene
     private IChip?[] CurrentRollChip = new IChip?[Game.MAXPLAYER];
 
     private HitSound[] HitSound = new HitSound[Game.MAXPLAYER];
+
+    private NamePlate[] NamePlates;
 
     private float[] NoteAnimeCounter = new float[Game.MAXPLAYER];
 
@@ -130,9 +141,15 @@ class PlayScene : Scene
 
     private bool[] Maxed = new bool[Game.MAXPLAYER];
 
+    private bool[] Missed = new bool[Game.MAXPLAYER];
+
+    private int[] CurrentMissCount = new int[Game.MAXPLAYER];
+
     private float[] BPM = new float[Game.MAXPLAYER];
 
     private List<Action>[] RollProcesss = new List<Action>[Game.MAXPLAYER] { new List<Action>(), new List<Action>() };
+
+    private bool[] BalloonMode = new bool[Game.MAXPLAYER];
 
     private void StartAutoRoll(int player)
     {
@@ -167,6 +184,33 @@ class PlayScene : Scene
         });
     }
 
+    private void SetNormalCharaAnime(int player)
+    {
+        if (GoGoTime[player])
+        {
+            Charas[player].ChangeAnime(CharaAnimeType.GoGo, player, true);
+        }
+        else 
+        {
+            if (CurrentMissCount[player] >= 6)
+            {
+                Charas[player].ChangeAnime(CharaAnimeType.Miss_Down, player, true);
+            }
+            else if (Missed[player])
+            {
+                Charas[player].ChangeAnime(CharaAnimeType.Miss, player, true);
+            }
+            else if (Cleared[player])
+            {
+                Charas[player].ChangeAnime(CharaAnimeType.Clear, player, true);
+            }
+            else
+            {
+                Charas[player].ChangeAnime(CharaAnimeType.Normal, player, true);
+            }
+        }
+    }
+
     private void Event(PlayEventType playEventType, int player)
     {
         switch(playEventType)
@@ -179,31 +223,86 @@ class PlayScene : Scene
             case PlayEventType.GoGoStart:
             {
                 Lane[player].GoGoIn();
+                if (PlayerCount == 1) 
+                {
+                    GoGoSplash.Start();
+                }
+                
+                if (!BalloonMode[player]) Charas[player].ChangeAnime(CharaAnimeType.GoGoStart, player, false, () => SetNormalCharaAnime(player));
             }
             break;
             case PlayEventType.GoGoEnd:
             {
                 Lane[player].GoGoOut();
+                if (!BalloonMode[player]) SetNormalCharaAnime(player);
             }
             break;
             case PlayEventType.ClearIn:
             {
                 Background.ClearIn(player);
+                if (!BalloonMode[player]) Charas[player].ChangeAnime(CharaAnimeType.ClearIn, player, false, () => SetNormalCharaAnime(player));
             }
             break;
             case PlayEventType.ClearOut:
             {
                 Background.ClearOut(player);
+                if (!BalloonMode[player]) Charas[player].ChangeAnime(CharaAnimeType.ClearOut, player, false, () => SetNormalCharaAnime(player));
             }
             break;
             case PlayEventType.SoulIn:
             {
                 Background.MaxIn(player);
+                if (!BalloonMode[player]) Charas[player].ChangeAnime(CharaAnimeType.SoulIn, player, false, () => SetNormalCharaAnime(player));
             }
             break;
             case PlayEventType.SoulOut:
             {
                 Background.MaxOut(player);
+            }
+            break;
+            case PlayEventType.Return:
+            {
+                if (!GoGoTime[player] && !BalloonMode[player]) Charas[player].ChangeAnime(CharaAnimeType.Return, player, false, () => SetNormalCharaAnime(player));
+            }
+            break;
+            case PlayEventType.Roll:
+            {
+                Background.AddRollEffect(player);
+            }
+            break;
+            case PlayEventType.Balloon_Breaking:
+            {
+                Balloon[player].Open();
+                Balloon[player].SetNumber(CurrentRollChip[player].BalloonCount - CurrentRollChip[player].NowRollCount);
+                Charas[player].ChangeAnime(CharaAnimeType.Balloon_Breaking, player, false);
+                if (!BalloonMode[player]) 
+                {
+                    BalloonMode[player] = true;
+                }
+            }
+            break;
+            case PlayEventType.Balloon_Broke:
+            {
+                Rainbow[player].Open();
+                FlyNotes[player].Add(FlyNoteType.Don);
+                Balloon[player].Broke();
+                Charas[player].ChangeAnime(CharaAnimeType.Balloon_Broke, player, false, () => 
+                {
+                    BalloonMode[player] = false;
+                    SetNormalCharaAnime(player);
+                });
+                
+                Game.Skin.Assets.Play_Balloon_Broke_Sound.Play();
+            }
+            break;
+            case PlayEventType.Balloon_Miss:
+            {
+                Balloon[player].Miss();
+                Charas[player].ChangeAnime(CharaAnimeType.Balloon_Miss, player, false, () => 
+                {
+                    BalloonMode[player] = false;
+                    SetNormalCharaAnime(player);
+                });
             }
             break;
             case PlayEventType.End:
@@ -212,21 +311,51 @@ class PlayScene : Scene
                 {
                     if (States[player].Ok == 0 && States[player].Miss == 0)
                     {
+                        Charas[player].ChangeAnime(CharaAnimeType.Jump_Max, player, false, () => SetNormalCharaAnime(player));
                         EndAnime.PlayAnime(ClearType.AllPerfect, player);
                     }
                     else if (States[player].Ok == 0)
                     {
+                        Charas[player].ChangeAnime(CharaAnimeType.Jump_Max, player, false, () => SetNormalCharaAnime(player));
                         EndAnime.PlayAnime(ClearType.FullCombo, player);
                     }
                     else
                     {
+                        Charas[player].ChangeAnime(CharaAnimeType.ClearIn, player, false, () => SetNormalCharaAnime(player));
                         EndAnime.PlayAnime(ClearType.Clear, player);
                     }
                 }
                 else 
                 {
+                    Charas[player].ChangeAnime(CharaAnimeType.ClearOut, player, false, () => SetNormalCharaAnime(player));
                     EndAnime.PlayAnime(ClearType.None, player);
                 }
+
+                Task.Run(() => 
+                {
+                    Thread.Sleep(8000);
+                    GameEngine.ASyncActions.Add(() => 
+                    {
+                        Game.Fade.StartFade(Game.Skin.Assets.Fade_Black, 1.5f, 0.5f, () =>
+                        {
+                            GameEngine.SceneManager_.ChangeScene(new ResultScene(new () 
+                            { 
+                                {
+                                    "Values", new ResultValues[2] { 
+                                        new ResultValues() 
+                                        { 
+
+                                        },
+                                        new ResultValues() 
+                                        { 
+
+                                        }  
+                                    }
+                                }
+                            }));
+                        });
+                    });
+                });
             }
             break;
         }
@@ -354,6 +483,7 @@ class PlayScene : Scene
                 States[player].Gauge += AddGauges[player].Perfect;
                 States[player].Gauge = Math.Min(Math.Max(States[player].Gauge, 0), 100);
                 States[player].Combo++;
+                CurrentMissCount[player] = 0;
 
                 BranchStates[player].Perfect++;
                 BranchStates[player].Combo++;
@@ -364,6 +494,12 @@ class PlayScene : Scene
                 TaikoUI[player].SetScore(States[player].Score);
 
                 HitExplosion[player].AddEffect(chip.ChipType == ChipType.Don_Big || chip.ChipType == ChipType.Ka_Big ? 2 : 0);
+                
+                if (Missed[player])
+                {
+                    Missed[player] = false;
+                    Event(PlayEventType.Return, player);
+                }
             }
             break;
             case JudgeType.Ok:
@@ -373,6 +509,7 @@ class PlayScene : Scene
                 States[player].Gauge += AddGauges[player].Ok;
                 States[player].Gauge = Math.Min(Math.Max(States[player].Gauge, 0), 100);
                 States[player].Combo++;
+                CurrentMissCount[player] = 0;
                 
                 BranchStates[player].Ok++;
                 BranchStates[player].Combo++;
@@ -383,6 +520,12 @@ class PlayScene : Scene
                 TaikoUI[player].SetScore(States[player].Score);
                 
                 HitExplosion[player].AddEffect(chip.ChipType == ChipType.Don_Big || chip.ChipType == ChipType.Ka_Big ? 3 : 1);
+                
+                if (Missed[player])
+                {
+                    Missed[player] = false;
+                    Event(PlayEventType.Return, player);
+                }
             }
             break;
             case JudgeType.Miss:
@@ -392,6 +535,7 @@ class PlayScene : Scene
                 States[player].Gauge += AddGauges[player].Miss;
                 States[player].Gauge = Math.Min(Math.Max(States[player].Gauge, 0), 100);
                 States[player].Combo = 0;
+                CurrentMissCount[player]++;
                 
                 BranchStates[player].Miss = 0;
                 BranchStates[player].Combo = 0;
@@ -400,6 +544,17 @@ class PlayScene : Scene
                 TaikoUI[player].SetCombo(States[player].Combo);
                 TaikoUI[player].AddScore(AddScores[player].Miss);
                 TaikoUI[player].SetScore(States[player].Score);
+
+                if (CurrentMissCount[player] == 6)
+                {
+                    if (!GoGoTime[player]) SetNormalCharaAnime(player);
+                }
+
+                if (!Missed[player])
+                {
+                    Missed[player] = true;
+                    if (!GoGoTime[player]) SetNormalCharaAnime(player);
+                }
             }
             break;
             case JudgeType.Roll:
@@ -413,6 +568,8 @@ class PlayScene : Scene
 
                 Roll[player].Open(false);
                 Roll[player].SetNumber(CurrentRollChip[player].NowRollCount);
+
+                Event(PlayEventType.Roll, player);
                 
                 if (hitType == HitType.Don)
                 {
@@ -439,6 +596,8 @@ class PlayScene : Scene
 
                 Roll[player].Open(false);
                 Roll[player].SetNumber(CurrentRollChip[player].NowRollCount);
+
+                Event(PlayEventType.Roll, player);
                 
                 if (hitType == HitType.Don)
                 {
@@ -463,8 +622,7 @@ class PlayScene : Scene
                 TaikoUI[player].AddScore(AddScores[player].Balloon_Roll);
                 TaikoUI[player].SetScore(States[player].Score);
 
-                Balloon[player].Open();
-                Balloon[player].SetNumber(CurrentRollChip[player].BalloonCount - CurrentRollChip[player].NowRollCount);
+                Event( PlayEventType.Balloon_Breaking, player);
 
                 CurrentRollChip[player].Hit = true;
             }
@@ -479,10 +637,7 @@ class PlayScene : Scene
                 TaikoUI[player].AddScore(AddScores[player].Balloon_Broke);
                 TaikoUI[player].SetScore(States[player].Score);
 
-                Rainbow[player].Open();
-                FlyNotes[player].Add(FlyNoteType.Don);
-
-                Balloon[player].Broke();
+                Event( PlayEventType.Balloon_Broke, player);
             }
             break;
             case JudgeType.Kusudama:
@@ -545,21 +700,36 @@ class PlayScene : Scene
 
         if (hit)
         {
-            switch(chip.ChipType)
+            if (judge != JudgeType.Miss)
             {
-                case ChipType.Don:
-                FlyNotes[player].Add(FlyNoteType.Don);
-                break;
-                case ChipType.Ka:
-                FlyNotes[player].Add(FlyNoteType.Ka);
-                break;
-                case ChipType.Don_Big:
-                case ChipType.Roll_Balloon_Start:
-                FlyNotes[player].Add(FlyNoteType.Don_Big);
-                break;
-                case ChipType.Ka_Big:
-                FlyNotes[player].Add(FlyNoteType.Ka_Big);
-                break;
+                switch(chip.ChipType)
+                {
+                    case ChipType.Don:
+                    FlyNotes[player].Add(FlyNoteType.Don);
+                    break;
+                    case ChipType.Ka:
+                    FlyNotes[player].Add(FlyNoteType.Ka);
+                    break;
+                    case ChipType.Don_Big:
+                    case ChipType.Roll_Balloon_Start:
+                    FlyNotes[player].Add(FlyNoteType.Don_Big);
+                    break;
+                    case ChipType.Ka_Big:
+                    FlyNotes[player].Add(FlyNoteType.Ka_Big);
+                    break;
+                }
+            }
+
+            if (States[player].Combo % 10 == 0 && States[player].Combo >= 10 && !GoGoTime[player] && !BalloonMode[player])
+            {
+                if (Maxed[player])
+                {
+                    Charas[player].ChangeAnime(CharaAnimeType.Jump_Max, player, false, () => SetNormalCharaAnime(player));
+                }
+                else 
+                {
+                    Charas[player].ChangeAnime(CharaAnimeType.Jump, player, false, () => SetNormalCharaAnime(player));
+                }
             }
             
             if (States[player].Combo == 10 && Courses[player] == CourseType.Easy)
@@ -812,7 +982,7 @@ class PlayScene : Scene
                     switch(CurrentRollChip[player].ChipType)
                     {
                         case ChipType.Roll_Balloon_Start:
-                        Balloon[player].Miss();
+                        Event( PlayEventType.Balloon_Miss, player);
                         break;
                     }
                 }
@@ -832,8 +1002,8 @@ class PlayScene : Scene
             case ChipType.GoGoStart:
             if (nowTime < 0 && !chip.Over)
             {
-                Event(PlayEventType.GoGoStart, player);
                 GoGoTime[player] = true;
+                Event(PlayEventType.GoGoStart, player);
 
                 chip.Over = true;
             }
@@ -841,8 +1011,8 @@ class PlayScene : Scene
             case ChipType.GoGoEnd:
             if (nowTime < 0 && !chip.Over)
             {
-                Event(PlayEventType.GoGoEnd, player);
                 GoGoTime[player] = false;
+                Event(PlayEventType.GoGoEnd, player);
 
                 chip.Over = true;
             }
@@ -904,9 +1074,12 @@ class PlayScene : Scene
         PlaySpeed = (float)args["PlaySpeed"];
         GameMode = (GameModeType)args["GameMode"];
         RightSide = (bool)args["RightSide"];
+        NamePlates = (NamePlate[])args["NamePlates"];
 
         for(int player = 0; player < PlayerCount; player++)
         {
+            Charas[player] = Game.Skin.Assets.Characters["Dev"];
+            Charas[player].LoadAssets();
             HitSound[player] = Game.Skin.Assets.HitSounds[Options[player].HitSound];
             NotePixelOffset[player] = (Options[player].Offset / 5.0f) * (Game.Skin.Value.Play_Notes.Padding / 36);
         }
@@ -914,11 +1087,12 @@ class PlayScene : Scene
         LoadChart(ChartPath);
 
         Background = new(PlayerCount, RightSide);
+        GoGoSplash = new();
         EndAnime = new(GameMode, PlayerCount);
+        Title = new(Chart.Title, "ジャンルはまだ未対応", "Default", 1, -1);
 
         for(int player = 0; player < PlayerCount; player++)
         {
-            BPM[player] = Chips[player][0].BPM * PlaySpeed;
             switch(GameMode)
             {
                 case GameModeType.Play:
@@ -960,7 +1134,7 @@ class PlayScene : Scene
             }
 
             int taikoSide = RightSide ? 1 : player;
-            TaikoUI[player] = new(player, taikoSide, (int)Courses[player], Options[player]);
+            TaikoUI[player] = new(player, taikoSide, (int)Courses[player], NamePlates[player], Options[player]);
             Lane[player] = new(player, Branchable[player]);
             Gauge[player] = new(GaugeType[player], player, taikoSide);
             HitExplosion[player] = new(player);
@@ -1039,7 +1213,11 @@ class PlayScene : Scene
         Reset();
         Start();
 
-        
+        for(int player = 0; player < PlayerCount; player++)
+        {
+            SetNormalCharaAnime(player);
+        }
+
         base.Activate();
     }
 
@@ -1064,7 +1242,7 @@ class PlayScene : Scene
             }
             else
             {
-                Reset();
+                //Reset();
                 Start();
             }
         }
@@ -1075,6 +1253,10 @@ class PlayScene : Scene
         else if (GameEngine.Input.GetKeyPressing(Silk.NET.Input.Key.Right))
         {
             NowTime = NowTime + (long)(GameEngine.Time_.DeltaTime * 1000000);
+        }
+        else if (GameEngine.Input.GetKeyPressing(Silk.NET.Input.Key.Number0))
+        {
+            Event(PlayEventType.End, 0);
         }
         /*
         else if (GameEngine.Input.GetKeyPressing(Silk.NET.Input.Key.Number1))
@@ -1119,11 +1301,13 @@ class PlayScene : Scene
 
         Background.SetGauge(new float[] { States[0].Gauge, States[1].Gauge } );
         Background.Update();
+        GoGoSplash.Update();
 
         EndAnime.Update();
 
         for(int player = 0; player < PlayerCount; player++)
         {
+
             if (Options[player].AutoPlay)
             {
                 /*
@@ -1160,6 +1344,7 @@ class PlayScene : Scene
             
             CurrentChip[player] = Chips[player][0];
             
+            Charas[player].Update(BPM[player], CharaSceneType.Play, player);
             Lane[player].Update();
             Gauge[player].Update();
             HitExplosion[player].Update();
@@ -1168,12 +1353,13 @@ class PlayScene : Scene
             FlyNotes[player].Update();
             Combo[player].Update();
             Roll[player].Update();
+
             Balloon[player].Update();
             ScoreRank[player].Update();
 
             Chips[player][0].InitHBValue();
 
-            NoteAnimeCounter[player] += (CurrentChip[player].BPM / 60.0f) * PlaySpeed * GameEngine.Time_.DeltaTime;
+            NoteAnimeCounter[player] += (BPM[player] / 60.0f) * GameEngine.Time_.DeltaTime;
             if (NoteAnimeCounter[player] >= 1)
             {
                 NoteAnimeCounter[player] = 0;
@@ -1248,12 +1434,15 @@ class PlayScene : Scene
             TaikoUI[player].Update();
         }
 
+        Title.Update();
+
         base.Update();
     }
 
     public override void Draw()
     {
         Background.Draw();
+        GoGoSplash.Draw();
         
         for(int player = 0; player < PlayerCount; player++)
         {
@@ -1265,7 +1454,12 @@ class PlayScene : Scene
 
         for(int player = 0; player < PlayerCount; player++)
         {
+            if (!BalloonMode[player]) Charas[player].Draw(Game.Skin.Value.Play_Chara[player].X, Game.Skin.Value.Play_Chara[player].Y, 1.0f, false, false, CharaSceneType.Play, 1, player);
+            
             TaikoUI[player].Draw();
+            
+            if (BalloonMode[player]) Charas[player].Draw(Game.Skin.Value.Play_Balloon_Chara[player].X, Game.Skin.Value.Play_Balloon_Chara[player].Y, 1, false, false, CharaSceneType.Play_Balloon, 1, player);
+            
             HitExplosion[player].DrawAfterTaikoBG();
             JudgeAnimes[player].Draw();
             Rainbow[player].Draw();
@@ -1277,6 +1471,8 @@ class PlayScene : Scene
         }
 
         EndAnime.Draw();
+
+        Title.Draw();
 
         base.Draw();
     }

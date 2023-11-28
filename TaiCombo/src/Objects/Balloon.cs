@@ -1,6 +1,8 @@
+using Silk.NET.Maths;
 using TaiCombo.Common;
 using TaiCombo.Engine;
 using TaiCombo.Engine.Enums;
+using TaiCombo.Engine.Helpers;
 using TaiCombo.Engine.Struct;
 using TaiCombo.Helper;
 
@@ -19,6 +21,8 @@ class Balloon
     private float BrokeCounter;
 
     private float MissCounter;
+
+    private Matrix4X4<float> Balloon_Pos;
 
     private enum States
     {
@@ -59,6 +63,7 @@ class Balloon
     public Balloon(int player)
     {
         Player = player;
+        Balloon_Pos = MatrixHelper.Get2DMatrix(Game.Skin.Value.Play_Balloon_Base[player].X, Game.Skin.Value.Play_Balloon_Base[player].Y, 1, 1, Game.Skin.Assets.Play_Balloon_Base.DefaultRect, false, false, 0, DrawOriginType.Left_Up);
     }
 
     public void Update()
@@ -105,7 +110,7 @@ class Balloon
         {
             case States.Breaking:
             {
-                Game.Skin.Assets.Play_Balloon_Base.Draw(Game.Skin.Value.Play_Balloon_Base[Player].X, Game.Skin.Value.Play_Balloon_Base[Player].Y);
+                Game.Skin.Assets.Play_Balloon_Base.Draw(Balloon_Pos);
                     
                 float numScale = NumHelper.GetNumJumpScale(NumberJump);
 

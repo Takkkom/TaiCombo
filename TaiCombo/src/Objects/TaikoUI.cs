@@ -35,6 +35,8 @@ class TaikoUI
 
     private float ComboShine;
 
+    private NamePlate NamePlate;
+
     private Options Options;
 
     private List<Sprite> DrawOptions = new();
@@ -70,11 +72,12 @@ class TaikoUI
         TaikoFlashOpacity[(int)taikoType] = 1.5f;
     }
 
-    public TaikoUI(int player, int taikoSide, int courseSymbol, Options options)
+    public TaikoUI(int player, int taikoSide, int courseSymbol, NamePlate namePlate, Options options)
     {
         Player = player;
         TaikoSide = taikoSide;
         CourseSymbol = courseSymbol;
+        NamePlate = namePlate;
         Options = options;
 
         if (Game.Skin.Assets.Options_ScrollSpeed.ContainsKey(options.ScrollSpeed)) DrawOptions.Add(Game.Skin.Assets.Options_ScrollSpeed[options.ScrollSpeed]);
@@ -159,8 +162,7 @@ class TaikoUI
             DrawOptions[i].Draw(x, y);
         }
 
-        NamePlateHelper.DrawNamePlate(Game.Skin.Value.Play_Taiko_NamePlate[Player].X, Game.Skin.Value.Play_Taiko_NamePlate[Player].Y,
-        new PlayerInfo() { Name = "えんぷてぃ", TitleInfo = new TitleInfo() { Title = "かり", TitleType = TitleType.Gold }, DanInfo = new DanInfo() { Title = "変人", ClearType = ClearType.AllPerfect } }, TaikoSide, Player);
+        NamePlate.Draw(Game.Skin.Value.Play_Taiko_NamePlate[Player].X, Game.Skin.Value.Play_Taiko_NamePlate[Player].Y, TaikoSide, Player);
 
 
 

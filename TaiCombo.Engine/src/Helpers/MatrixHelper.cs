@@ -8,7 +8,7 @@ public static class MatrixHelper
 {
     public static Matrix4X4<float> ScreenOffset = Matrix4X4.CreateTranslation(-1.0f, 1.0f, 0);
 
-    public static Matrix4X4<float> Get2DMatrix(float x, float y, float scaleX, float scaleY, RectangleF rectangle, bool flipX, bool flipY, float rotation, DrawOriginType drawOriginType, BlendType blendType)
+    public static Matrix4X4<float> Get2DMatrix(float x, float y, float scaleX, float scaleY, RectangleF rectangle, bool flipX, bool flipY, float rotation, DrawOriginType drawOriginType)
     {
         float gameAspect = (float)GameEngine.Resolution.X / GameEngine.Resolution.Y;
 

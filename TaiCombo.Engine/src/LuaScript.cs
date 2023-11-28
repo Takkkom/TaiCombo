@@ -10,23 +10,19 @@ public class LuaScript : IDisposable
 
     private LuaFunction LuaFuncLoadAssets;
     private LuaFunction LuaFuncInit;
-    private LuaFunction LuaFuncUpdate;
-    private LuaFunction LuaFuncDraw;
     
 
-    public LuaScript(string fileName)
+    public LuaScript(string fileName, FontRenderer mainFont, FontRenderer subFont)
     {
         Script = new();
         Script.State.Encoding = Encoding.UTF8;
 
-        Funcs = new LuaFuncs(fileName);
+        Funcs = new LuaFuncs(fileName, mainFont, subFont);
         Script["func"] = Funcs;
         Script.DoFile(fileName);
 
         LuaFuncLoadAssets = Script.GetFunction("loadAssets");
         LuaFuncInit = Script.GetFunction("init");
-        LuaFuncUpdate = Script.GetFunction("update");
-        LuaFuncDraw = Script.GetFunction("draw");
 
         LuaFuncLoadAssets.Call();
     }
@@ -36,23 +32,10 @@ public class LuaScript : IDisposable
         LuaFuncInit.Call();
     }
 
-    public virtual void Update()
-    {
-        Script["deltaTime"] = GameEngine.Time_.DeltaTime;
-        LuaFuncUpdate.Call();
-    }
-
-    public virtual void Draw()
-    {
-        LuaFuncDraw.Call();
-    }
-
     public void Dispose()
     {
         Funcs.Dispose();
         LuaFuncLoadAssets.Dispose();
         LuaFuncInit.Dispose();
-        LuaFuncUpdate.Dispose();
-        LuaFuncDraw.Dispose();
     }
 }

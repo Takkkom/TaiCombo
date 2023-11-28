@@ -13,7 +13,7 @@ class EndAnineScript : PlayBG
         LuaFuncPlayAnime.Call(player);
     }
 
-    public EndAnineScript(string fileName) : base(fileName)
+    public EndAnineScript(string fileName, FontRenderer mainFont, FontRenderer subFont) : base(fileName, mainFont, subFont)
     {
         LuaFuncPlayAnime = Script.GetFunction("playAnime");
     }

@@ -10,6 +10,7 @@ class Background
     private PlayBG? Up;
     private PlayBG? Down;
     private PlayBG? Down_Clear;
+    private PlayBG RollEffect;
     private PlayBG? Dancer;
     private Sprite? Footer;
     private PlayBG? Mob;
@@ -20,6 +21,7 @@ class Background
         Up?.SetGauge(bpm);
         Down?.SetGauge(bpm);
         Down_Clear?.SetGauge(bpm);
+        RollEffect?.SetGauge(bpm);
         Dancer?.SetGauge(bpm);
         Mob?.SetGauge(bpm);
     }
@@ -29,8 +31,19 @@ class Background
         Up?.SetBPM(bpm);
         Down?.SetBPM(bpm);
         Down_Clear?.SetBPM(bpm);
+        RollEffect?.SetBPM(bpm);
         Dancer?.SetBPM(bpm);
         Mob?.SetBPM(bpm);
+    }
+
+    public void AddRollEffect(int player)
+    {
+        Up?.AddRollEffect(player + 1);
+        Down?.AddRollEffect(player + 1);
+        Down_Clear?.AddRollEffect(player + 1);
+        RollEffect?.AddRollEffect(player + 1);
+        Dancer?.AddRollEffect(player + 1);
+        Mob?.AddRollEffect(player + 1);
     }
 
     public void ClearIn(int player)
@@ -38,6 +51,7 @@ class Background
         Up?.ClearIn(player + 1);
         Down?.ClearIn(player + 1);
         Down_Clear?.ClearIn(player + 1);
+        RollEffect?.ClearIn(player + 1);
         Dancer?.ClearIn(player + 1);
         Mob?.ClearIn(player + 1);
     }
@@ -47,6 +61,7 @@ class Background
         Up?.ClearOut(player + 1);
         Down?.ClearOut(player + 1);
         Down_Clear?.ClearOut(player + 1);
+        RollEffect?.ClearOut(player + 1);
         Dancer?.ClearOut(player + 1);
         Mob?.ClearOut(player + 1);
     }
@@ -56,6 +71,7 @@ class Background
         Up?.MaxIn(player + 1);
         Down?.MaxIn(player + 1);
         Down_Clear?.MaxIn(player + 1);
+        RollEffect?.MaxIn(player + 1);
         Dancer?.MaxIn(player + 1);
         Mob?.MaxIn(player + 1);
     }
@@ -65,6 +81,7 @@ class Background
         Up?.MaxOut(player + 1);
         Down?.MaxOut(player + 1);
         Down_Clear?.MaxOut(player + 1);
+        RollEffect?.MaxOut(player + 1);
         Dancer?.MaxOut(player + 1);
         Mob?.MaxOut(player + 1);
     }
@@ -76,6 +93,11 @@ class Background
         Up.SetPlayerCount(playerCount);
         Up.SetP1IsBlue(rightSide);
         Up.Init();
+
+        RollEffect = Game.Skin.Assets.Play_BG_RollEffect[bg.RollEffect[Random.Shared.Next(0, bg.RollEffect.Length)]];
+        RollEffect.SetPlayerCount(playerCount);
+        RollEffect.SetP1IsBlue(rightSide);
+        RollEffect.Init();
 
         if (playerCount == 1)
         {
@@ -100,6 +122,9 @@ class Background
         Up?.Update();
         Down?.Update();
         Down_Clear?.Update();
+
+        RollEffect?.Update();
+
         Dancer?.Update();
         Mob?.Update();
     }
@@ -109,6 +134,8 @@ class Background
         Up?.Draw();
         Down?.Draw();
         Down_Clear?.Draw();
+
+        RollEffect?.Draw();
 
         Dancer?.Draw();
         Footer?.Draw(0, GameEngine.Resolution.Y, drawOriginType:DrawOriginType.Left_Down);

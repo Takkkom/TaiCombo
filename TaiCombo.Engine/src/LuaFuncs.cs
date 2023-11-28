@@ -1,6 +1,5 @@
-using System.Text;
-using NLua;
 using TaiCombo.Engine.Enums;
+using TaiCombo.Engine.Struct;
 
 namespace TaiCombo.Engine;
 
@@ -8,11 +7,16 @@ public class LuaFuncs : IDisposable
 {
     private List<Sprite> Sprites = new();
 
+    private FontRenderer MainFont;
+    private FontRenderer SubFont;
+
     private string BaseDir;
 
-    public LuaFuncs(string fileName)
+    public LuaFuncs(string fileName, FontRenderer mainFont, FontRenderer subFont)
     {
         BaseDir = $"{fileName}{Path.DirectorySeparatorChar}..{Path.DirectorySeparatorChar}";
+        MainFont = mainFont;
+        SubFont = subFont;
     }
 
     public int AddSprite(string fileName)
@@ -20,48 +24,76 @@ public class LuaFuncs : IDisposable
         string truePath = fileName.Replace('/', Path.DirectorySeparatorChar);
         Sprites.Add(new Sprite($"{BaseDir}{truePath}"));
 
-        return Sprites.Count - 1;
+        return Sprites.Count;
+    }
+    
+    public int AddMainFontSprite(string text, float r, float g, float b, float size)
+    {
+        Sprites.Add(MainFont.GenSpriteText(text, new (r, g, b, 1), size));
+
+        return Sprites.Count;
+    }
+
+    public int AddMainFontEdgeSprite(string text, float r, float g, float b, float size, float edge_r, float edge_g, float edge_b, float edgeRatio)
+    {
+        Sprites.Add(MainFont.GenSpriteText(text, new (r, g, b, 1), size, new EdgeInfo[] { new EdgeInfo() { Color = new (edge_r, edge_g, edge_b, 1), Ratio = edgeRatio } }));
+
+        return Sprites.Count;
+    }
+    
+    public int AddSubFontSprite(string text, float r, float g, float b, float size)
+    {
+        Sprites.Add(SubFont.GenSpriteText(text, new (r, g, b, 1), size));
+
+        return Sprites.Count;
+    }
+
+    public int AddSubFontEdgeSprite(string text, float r, float g, float b, float size, float edge_r, float edge_g, float edge_b, float edgeRatio)
+    {
+        Sprites.Add(SubFont.GenSpriteText(text, new (r, g, b, 1), size, new EdgeInfo[] { new EdgeInfo() { Color = new (edge_r, edge_g, edge_b, 1), Ratio = edgeRatio } }));
+
+        return Sprites.Count;
     }
 
     public void DrawSpriteOpacity(float x, float y, float opacity, int index)
     {
-        Sprite sprite = Sprites[index];
+        Sprite sprite = Sprites[index - 1];
         DrawSpriteFull(x, y, 1, 1, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, 0, 1, 1, 1, opacity, "Left_Up", "Normal", index);
     }
 
     public void DrawSpriteBlendOpacity(float x, float y, float opacity, string blend, int index)
     {
-        Sprite sprite = Sprites[index];
+        Sprite sprite = Sprites[index - 1];
         DrawSpriteFull(x, y, 1, 1, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, 0, 1, 1, 1, opacity, "Left_Up", blend, index);
     }
 
     public void DrawSprite(float x, float y, int index)
     {
-        Sprite sprite = Sprites[index];
+        Sprite sprite = Sprites[index - 1];
         DrawSpriteFull(x, y, 1, 1, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, 0, 1, 1, 1, 1, "Left_Up", "Normal", index);
     }
 
     public void DrawSpriteOrigin(float x, float y, string drawOrigin, int index)
     {
-        Sprite sprite = Sprites[index];
+        Sprite sprite = Sprites[index - 1];
         DrawSpriteFull(x, y, 1, 1, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, 0, 1, 1, 1, 1, drawOrigin, "Normal", index);
     }
 
     public void DrawSpriteOriginScale(float x, float y, float scaleX, float scaleY, string drawOrigin, int index)
     {
-        Sprite sprite = Sprites[index];
+        Sprite sprite = Sprites[index - 1];
         DrawSpriteFull(x, y, scaleX, scaleY, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, 0, 1, 1, 1, 1, drawOrigin, "Normal", index);
     }
 
     public void DrawSpriteOriginScaleAlpha(float x, float y, float scaleX, float scaleY, float alpha, string drawOrigin, int index)
     {
-        Sprite sprite = Sprites[index];
+        Sprite sprite = Sprites[index - 1];
         DrawSpriteFull(x, y, scaleX, scaleY, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, 0, 1, 1, 1, alpha, drawOrigin, "Normal", index);
     }
 
     public void DrawSpriteOriginRotation(float x, float y, float rotation, string drawOrigin, int index)
     {
-        Sprite sprite = Sprites[index];
+        Sprite sprite = Sprites[index - 1];
         DrawSpriteFull(x, y, 1, 1, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, rotation, 1, 1, 1, 1, drawOrigin, "Normal", index);
     }
 
@@ -75,7 +107,7 @@ public class LuaFuncs : IDisposable
         string drawOrigin, string blend,
         int index)
     {
-        Sprite sprite = Sprites[index];
+        Sprite sprite = Sprites[index - 1];
 
         DrawOriginType drawOriginType;
         switch(drawOrigin)
@@ -140,14 +172,27 @@ public class LuaFuncs : IDisposable
 
     public int GetSpriteWidth(int index)
     {
-        Sprite sprite = Sprites[index];
+        Sprite sprite = Sprites[index - 1];
         return sprite.TextureSize.Width;
     }
 
     public int GetSpriteHeight(int index)
     {
-        Sprite sprite = Sprites[index];
+        Sprite sprite = Sprites[index - 1];
         return sprite.TextureSize.Height;
+    }
+
+    public int GetFileCount(string dirPath, string searchPattern)
+    {
+        string truePath = dirPath.Replace('/', Path.DirectorySeparatorChar);
+        string[] files = Directory.GetFiles($"{BaseDir}{truePath}", searchPattern);
+        return files.Length;
+    }
+
+    public void DisposeSprite(int index)
+    {
+        if (index < 1) return;
+        Sprites[index - 1].Dispose();
     }
 
     public void Dispose()

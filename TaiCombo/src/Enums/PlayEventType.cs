@@ -11,6 +11,11 @@ enum PlayEventType
     ClearOut,
     SoulIn,
     SoulOut,
+    Return,
     Failed,
+    Roll,
+    Balloon_Breaking,
+    Balloon_Broke,
+    Balloon_Miss,
     End
 }

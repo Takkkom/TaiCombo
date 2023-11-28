@@ -11,7 +11,7 @@ class ResultScene : Scene
 
     public ResultScene(Dictionary<string, object> args)
     {
-        Values = (ResultValues[])args["values"];
+        Values = (ResultValues[])args["Values"];
     }
 
     public override void Activate()

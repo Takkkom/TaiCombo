@@ -269,7 +269,7 @@ public class Sprite : IDisposable
         TextureSize = new Size(bitmap.Width, bitmap.Height);
         DefaultRect = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
 
-        void create(SKBitmap bm, bool disposeBitmap)
+        void create(SKBitmap bm, bool disposeBitmap, PixelFormat pixelFormat)
         {
             //テクスチャハンドルの作成-----
             Handle = GameEngine.Gl.GenTexture();
@@ -279,7 +279,7 @@ public class Sprite : IDisposable
             //テクスチャのデータをVramに送る
             fixed(byte* bytes = bm.Bytes)
             {
-                GameEngine.Gl.TexImage2D(TextureTarget.Texture2D, 0, (int)PixelFormat.Bgra, (uint)bm.Width, (uint)bm.Height, 0, PixelFormat.Bgra, GLEnum.UnsignedByte, bytes);
+                GameEngine.Gl.TexImage2D(TextureTarget.Texture2D, 0, (int)pixelFormat, (uint)bm.Width, (uint)bm.Height, 0, pixelFormat, GLEnum.UnsignedByte, bytes);
             }
             //-----
 
@@ -300,14 +300,14 @@ public class Sprite : IDisposable
         {
             if (Thread.CurrentThread.ManagedThreadId == GameEngine.MainThreadID)
             {
-                create(bitmap, false);
+                create(bitmap, false, PixelFormat.Bgra);
             }
             else 
             {
                 SKBitmap bm = bitmap.Copy();
                 Action createInstance = () => 
                 {
-                    create(bm, true);
+                    create(bm, true, PixelFormat.Bgra);
                 };
                 GameEngine.ASyncActions.Add(createInstance);
                 while(GameEngine.ASyncActions.Contains(createInstance))
@@ -330,7 +330,7 @@ public class Sprite : IDisposable
     /// <param name="flipY"></param>
     /// <param name="rotation"></param>
     /// <param name="color"></param>
-    public void Draw(Matrix4X4<float> mvp, RectangleF? rectangle = null, Color4? color = null, BlendType blendType = BlendType.Normal)
+    public void Draw(Matrix4X4<float> mvp, RectangleF? rectangle = null, Color4? color = null, BlendType blendType = BlendType.Normal, uint? shader = null)
     {
         if (Failed) return;
 
@@ -358,10 +358,18 @@ public class Sprite : IDisposable
             _rectangle = rectangle.Value;
         }
         //------
+
+        //Uniform4よりこれが先
+        if (shader == null)
+        {
+            GameEngine.Gl.UseProgram(ShaderProgram);
+        }
+        else 
+        {
+            GameEngine.Gl.UseProgram(shader.Value);
+        }
         
         BlendHelper.SetBlend(blendType);
-
-        GameEngine.Gl.UseProgram(ShaderProgram);//Uniform4よりこれが先
 
         GameEngine.Gl.BindTexture(TextureTarget.Texture2D, Handle); //テクスチャをバインド
 
@@ -402,7 +410,7 @@ public class Sprite : IDisposable
     /// <param name="flipY"></param>
     /// <param name="rotation"></param>
     /// <param name="color"></param>
-    public void Draw(float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, RectangleF? rectangle = null, bool flipX = false, bool flipY = false, float rotation = 0.0f, Color4? color = null, DrawOriginType drawOriginType = DrawOriginType.Left_Up, BlendType blendType = BlendType.Normal)
+    public void Draw(float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, RectangleF? rectangle = null, bool flipX = false, bool flipY = false, float rotation = 0.0f, Color4? color = null, DrawOriginType drawOriginType = DrawOriginType.Left_Up, BlendType blendType = BlendType.Normal, uint? shader = null)
     {
         if (Failed) return;
 
@@ -418,9 +426,9 @@ public class Sprite : IDisposable
         }
         //------
 
-        Matrix4X4<float> mvp = MatrixHelper.Get2DMatrix(x, y, scaleX, scaleY, _rectangle, flipX, flipY, rotation, drawOriginType, blendType);
+        Matrix4X4<float> mvp = MatrixHelper.Get2DMatrix(x, y, scaleX, scaleY, _rectangle, flipX, flipY, rotation, drawOriginType);
 
-        Draw(mvp, rectangle, color, blendType);
+        Draw(mvp, rectangle, color, blendType, shader);
     }
 
     /// <summary>

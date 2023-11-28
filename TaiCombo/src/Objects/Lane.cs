@@ -243,13 +243,15 @@ class Lane
         {
             float scale = 2 - GoGoFireInCounter;
             Game.Skin.Assets.Play_Lane_GoGoFire.Draw(Game.Skin.Value.Play_Lane_GoGoFire.Pos[Player].X, Game.Skin.Value.Play_Lane_GoGoFire.Pos[Player].Y, 
-            scaleX:scale, scaleY:scale, rectangle:new RectangleF(Game.Skin.Value.Play_Lane_GoGoFire.Width * (int)(GoGoFireCounter * 7), 0, Game.Skin.Value.Play_Lane_GoGoFire.Width, Game.Skin.Value.Play_Lane_GoGoFire.Height), drawOriginType:Engine.Enums.DrawOriginType.Center, blendType:Engine.Enums.BlendType.Add);
+            scaleX:scale, scaleY:scale, rectangle:new RectangleF(Game.Skin.Value.Play_Lane_GoGoFire.Width * (int)(GoGoFireCounter * 7), 0, Game.Skin.Value.Play_Lane_GoGoFire.Width, Game.Skin.Value.Play_Lane_GoGoFire.Height), drawOriginType:Engine.Enums.DrawOriginType.Center, blendType:Engine.Enums.BlendType.Screen);
         }
         else
         {
+            /*
             Game.Skin.Assets.Play_Lane_GoGoFire.Draw(Game.Skin.Value.Play_Lane_GoGoFire.Pos[Player].X, Game.Skin.Value.Play_Lane_GoGoFire.Pos[Player].Y, 
-            rectangle:new RectangleF(Game.Skin.Value.Play_Lane_GoGoFire.Width * (int)(GoGoFireCounter * 7), 0, Game.Skin.Value.Play_Lane_GoGoFire.Width, Game.Skin.Value.Play_Lane_GoGoFire.Height), drawOriginType:Engine.Enums.DrawOriginType.Center, blendType:Engine.Enums.BlendType.Add, 
+            rectangle:new RectangleF(Game.Skin.Value.Play_Lane_GoGoFire.Width * (int)(GoGoFireCounter * 7), 0, Game.Skin.Value.Play_Lane_GoGoFire.Width, Game.Skin.Value.Play_Lane_GoGoFire.Height), drawOriginType:Engine.Enums.DrawOriginType.Center, blendType:Engine.Enums.BlendType.Screen, 
             color:new (1, 1, 1, 1 - GoGoFireOutCounter));
+            */
         }
     }
 

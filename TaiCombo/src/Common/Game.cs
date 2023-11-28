@@ -1,7 +1,5 @@
 using Silk.NET.Maths;
 using TaiCombo.Engine;
-using TaiCombo.Engine.Struct;
-using TaiCombo.Engine.Enums;
 using TaiCombo.Scenes;
 using TaiCombo.Skin;
 
@@ -18,6 +16,8 @@ class Game : GameEngine
     public static SkinManager Skin { get; private set; } = new();
 
     public static PluginManager Plugins { get; private set; } = new();
+
+    public static FadeManager Fade { get; private set; } = new();
     
 
     private Overlay Overlay_;
@@ -74,10 +74,7 @@ class Game : GameEngine
 
     protected override void Update()
     {
-
-
-
-
+        Fade.Update();
         Overlay_.Update();
         
         base.Update();
@@ -85,8 +82,7 @@ class Game : GameEngine
 
     protected override void Draw()
     {
-
-
+        Fade.Draw();
         Overlay_.Draw();
 
         base.Draw();

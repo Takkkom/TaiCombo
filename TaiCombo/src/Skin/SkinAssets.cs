@@ -1,3 +1,4 @@
+using TaiCombo.Chara;
 using TaiCombo.Common;
 using TaiCombo.Engine;
 using TaiCombo.Enums;
@@ -16,6 +17,15 @@ class SkinAssets : IDisposable
     /// </summary>
     private List<IDisposable> DisposableAssets = new();
 
+    public Dictionary<string, IPlayerChara> Characters = new();
+
+    public FontRenderer Font_Main { get; private set; }
+    public FontRenderer Font_Sub { get; private set; }
+
+    public FadeScript Fade_Black { get; private set; }
+
+    public FadeScript Fade_ToPlay { get; private set; }
+
     public Sprite NamePlate_Base { get; private set; }
     public Sprite NamePlate_Left { get; private set; }
     public Sprite NamePlate_Right { get; private set; }
@@ -28,7 +38,6 @@ class SkinAssets : IDisposable
     public Sprite Options_Flip { get; private set; }
     public Dictionary<RandomType, Sprite> Options_Random { get; private set; } = new();
     public Sprite Options_Offset { get; private set; }
-
     
     public Dictionary<GaugeType, Sprite> Gauge_1P_Base { get; private set; } = new();
     public Dictionary<GaugeType, Sprite> Gauge_2P_Base { get; private set; } = new();
@@ -49,9 +58,12 @@ class SkinAssets : IDisposable
     public Dictionary<string, PlayBG> Play_BG_Up = new();
     public Dictionary<string, PlayBG> Play_BG_Down = new();
     public Dictionary<string, PlayBG> Play_BG_Down_Clear = new();
+    public Dictionary<string, PlayBG> Play_BG_RollEffect = new();
     public Dictionary<string, PlayBG> Play_BG_Dancer = new();
     public Dictionary<string, Sprite> Play_BG_Footer = new();
     public Dictionary<string, PlayBG> Play_BG_Mob = new();
+
+    public Sprite[] Play_GoGoSplashs { get; private set; }
 
     public Sprite Play_Lane_Base_Main { get; private set; }
     public Sprite Play_Lane_Base_Normal { get; private set; }
@@ -149,6 +161,8 @@ class SkinAssets : IDisposable
     public EndAnineScript Play_EndAnime_FullCombo { get; private set; }
     public EndAnineScript Play_EndAnime_AllPerfect { get; private set; }
 
+    public Dictionary<string, Sprite> Play_Title_GenrePlate { get; private set; } = new();
+
     public Sound Decide { get; private set; }
     public Sound Change { get; private set; }
     public Sound Play_EndAnime_Failed_Sound { get; private set; }
@@ -156,6 +170,7 @@ class SkinAssets : IDisposable
     public Sound Play_EndAnime_FullCombo_Sound { get; private set; }
     public Sound Play_EndAnime_AllPerfect_Sound { get; private set; }
     public List<HitSound> HitSounds { get; private set; } = new();
+    public Sound Play_Balloon_Broke_Sound { get; private set; }
 
     /// <summary>
     /// 2DSpriteの作成と同時にDisposableAssetsに登録します
@@ -174,13 +189,14 @@ class SkinAssets : IDisposable
     /// </summary>
     /// <param name="path"></param>
     /// <returns></returns>
-    private Sprite[] CreateSpriteArray(string path)
+    private Sprite[] CreateSpriteArray(string path, bool numOnly = false)
     {
         string[] files = Directory.GetFiles(path, "*.png");
         Sprite[] result = new Sprite[files.Length];
         for(int i = 0; i < files.Length; i++)
         {
-            Sprite sprite = new(files[i]);
+            string fileName = numOnly ? $"{path}{i}.png" : files[i];
+            Sprite sprite = new(fileName);
             result[i] = sprite;
             DisposableAssets.Add(sprite);
         }
@@ -218,7 +234,7 @@ class SkinAssets : IDisposable
     /// <returns></returns>
     private PlayBG CreatePlayBG(string path)
     {
-        PlayBG script = new(path);
+        PlayBG script = new(path, Font_Main, Font_Sub);
         DisposableAssets.Add(script);
         return script;
     }
@@ -230,23 +246,75 @@ class SkinAssets : IDisposable
     /// <returns></returns>
     private EndAnineScript CreateEndAnimeScript(string path)
     {
-        EndAnineScript script = new(path);
+        EndAnineScript script = new(path, Font_Main, Font_Sub);
         DisposableAssets.Add(script);
         return script;
+    }
+
+    /// <summary>
+    /// FadeScriptの作成と同時にDisposableAssetsに登録します
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    private FadeScript CreateFadeScript(string path)
+    {
+        FadeScript script = new(path, Font_Main, Font_Sub);
+        DisposableAssets.Add(script);
+        return script;
+    }
+
+    /// <summary>
+    /// PlayBGの作成と同時にDisposableAssetsに登録します
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    private FontRenderer CreateFont(string path)
+    {
+        FontRenderer font = new(path);
+        DisposableAssets.Add(font);
+        return font;
     }
 
 
     public SkinAssets()
     {
+        string charaPath = $"Global{Path.DirectorySeparatorChar}Characters{Path.DirectorySeparatorChar}";
+        string[] charaDirs = Directory.GetDirectories(charaPath);
+        for(int i = 0; i < charaDirs.Length; i++)
+        {
+            string name = Path.GetFileName(charaDirs[i]);
+            IPlayerChara playerChara = new LuaChara(charaDirs[i]);
+            Characters.Add(name, playerChara);
+            DisposableAssets.Add(playerChara);
+        }
+
+
+        Font_Main = CreateFont($"{Game.Skin.SkinPath}{Game.Skin.Value.Font_Main.Replace('/', Path.DirectorySeparatorChar)}");
+        Font_Sub = CreateFont($"{Game.Skin.SkinPath}{Game.Skin.Value.Font_Sub.Replace('/', Path.DirectorySeparatorChar)}");
+
+
+        string fadePath = $"{Game.Skin.GraphicsPath}Fade{Path.DirectorySeparatorChar}";
+
+        Fade_Black = CreateFadeScript($"{fadePath}Black{Path.DirectorySeparatorChar}Script.lua");
+        Fade_ToPlay = CreateFadeScript($"{fadePath}ToPlay{Path.DirectorySeparatorChar}Script.lua");
+        
+
+
+
         string nameplatePath = $"{Game.Skin.GraphicsPath}NamePlate{Path.DirectorySeparatorChar}";
+        
         NamePlate_Base = CreateSprite($"{nameplatePath}Base.png");
         NamePlate_Left = CreateSprite($"{nameplatePath}Left.png");
         NamePlate_Right = CreateSprite($"{nameplatePath}Right.png");
         NamePlate_1P = CreateSprite($"{nameplatePath}1P.png");
         NamePlate_2P = CreateSprite($"{nameplatePath}2P.png");
 
+
+
+
+
         string optionsPath = $"{Game.Skin.GraphicsPath}Options{Path.DirectorySeparatorChar}";
-        
+
         Options_None = CreateSprite($"{optionsPath}None.png");
 
         string[] scrollFiles = Directory.GetFiles($"{optionsPath}", "Scroll_*.png");
@@ -263,6 +331,12 @@ class SkinAssets : IDisposable
         Options_Random.Add(RandomType.Minor, CreateSprite($"{optionsPath}Random_Minor.png"));
         Options_Random.Add(RandomType.Random, CreateSprite($"{optionsPath}Random_Random.png"));
         Options_Offset = CreateSprite($"{optionsPath}Offset.png");
+
+
+
+
+
+
 
         string gaugePath = $"{Game.Skin.GraphicsPath}Gauge{Path.DirectorySeparatorChar}";
         Gauge_1P_Base.Add(GaugeType.Level0, CreateSprite($"{gaugePath}1P_0_Base.png"));
@@ -357,6 +431,20 @@ class SkinAssets : IDisposable
         Gauge_SoulText = CreateSprite($"{gaugePath}SoulText.png");
         Gauge_SoulFire = CreateSprite($"{gaugePath}SoulFire.png");
 
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
         string playPath = $"{Game.Skin.GraphicsPath}Play{Path.DirectorySeparatorChar}";
 
         string bgPath = $"{playPath}Background{Path.DirectorySeparatorChar}Normal{Path.DirectorySeparatorChar}";
@@ -379,6 +467,12 @@ class SkinAssets : IDisposable
             Play_BG_Down_Clear.Add(Path.GetFileName(downClearBGs[i]), CreatePlayBG($"{downClearBGs[i]}{Path.DirectorySeparatorChar}Script.lua"));   
         }
 
+        string[] rollEffectBGs = Directory.GetDirectories($"{bgPath}RollEffect{Path.DirectorySeparatorChar}");
+        for(int i = 0; i < rollEffectBGs.Length; i++)
+        {
+            Play_BG_RollEffect.Add(Path.GetFileName(rollEffectBGs[i]), CreatePlayBG($"{rollEffectBGs[i]}{Path.DirectorySeparatorChar}Script.lua"));   
+        }
+
         string[] dancers = Directory.GetDirectories($"{bgPath}Dancer{Path.DirectorySeparatorChar}");
         for(int i = 0; i < dancers.Length; i++)
         {
@@ -396,6 +490,8 @@ class SkinAssets : IDisposable
         {
             Play_BG_Mob.Add(Path.GetFileName(mobs[i]), CreatePlayBG($"{mobs[i]}{Path.DirectorySeparatorChar}Script.lua"));   
         }
+
+        Play_GoGoSplashs = CreateSpriteArray($"{playPath}GoGoSplashs{Path.DirectorySeparatorChar}", true);
 
         Play_Lane_Base_Main = CreateSprite($"{playPath}Lane{Path.DirectorySeparatorChar}Base_Main.png");
         Play_Lane_Base_Normal = CreateSprite($"{playPath}Lane{Path.DirectorySeparatorChar}Base_Normal.png");
@@ -503,12 +599,20 @@ class SkinAssets : IDisposable
         Play_EndAnime_FullCombo = CreateEndAnimeScript($"{playPath}EndAnime{Path.DirectorySeparatorChar}FullCombo{Path.DirectorySeparatorChar}Script.lua");
         Play_EndAnime_AllPerfect = CreateEndAnimeScript($"{playPath}EndAnime{Path.DirectorySeparatorChar}AllPerfect{Path.DirectorySeparatorChar}Script.lua");
 
+        string[] genrePlates = Directory.GetFiles($"{playPath}GenrePlate{Path.DirectorySeparatorChar}");
+        for(int i = 0; i < genrePlates.Length; i++)
+        {
+            Play_Title_GenrePlate.Add(Path.GetFileNameWithoutExtension(genrePlates[i]), CreateSprite(genrePlates[i]));   
+        }
+
+
         Decide = CreateSound($"{Game.Skin.SoundsPath}Decide.ogg");
         Change = CreateSound($"{Game.Skin.SoundsPath}Change.ogg");
         Play_EndAnime_Failed_Sound = CreateSound($"{Game.Skin.SoundsPath}Play{Path.DirectorySeparatorChar}EndAnime{Path.DirectorySeparatorChar}Failed.ogg");
         Play_EndAnime_Clear_Sound = CreateSound($"{Game.Skin.SoundsPath}Play{Path.DirectorySeparatorChar}EndAnime{Path.DirectorySeparatorChar}Clear.ogg");
         Play_EndAnime_FullCombo_Sound = CreateSound($"{Game.Skin.SoundsPath}Play{Path.DirectorySeparatorChar}EndAnime{Path.DirectorySeparatorChar}FullCombo.ogg");
         Play_EndAnime_AllPerfect_Sound = CreateSound($"{Game.Skin.SoundsPath}Play{Path.DirectorySeparatorChar}EndAnime{Path.DirectorySeparatorChar}AllPerfect.ogg");
+        Play_Balloon_Broke_Sound = CreateSound($"{Game.Skin.SoundsPath}Play{Path.DirectorySeparatorChar}Balloon_Broke.ogg");
 
         for(int i = 0; i < Game.Skin.Value.HitSounds.Length; i++)
         {

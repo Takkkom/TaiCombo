@@ -265,8 +265,8 @@ public class GameEngine : IDisposable
 
             Gl = new GL(AngleContext);
             Gl.Enable(GLEnum.Blend);
-            AngleContext.SwapInterval(FrameMode_ == FrameMode.VSync ? 1 : 0);
             BlendHelper.SetBlend(BlendType.Normal);
+            AngleContext.SwapInterval(FrameMode_ == FrameMode.VSync ? 1 : 0);
             Sprite.Init();
 
             Input = new(Window_);
@@ -307,7 +307,7 @@ public class GameEngine : IDisposable
         {
             if (ASyncActions.Count > 0)
             {
-                ASyncActions[0].Invoke();
+                ASyncActions[0]?.Invoke();
                 ASyncActions.Remove(ASyncActions[0]);
             }
             

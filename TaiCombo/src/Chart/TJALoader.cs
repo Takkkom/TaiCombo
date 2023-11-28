@@ -271,7 +271,7 @@ class TJALoader : IChartInfo
                 chip.Delay = 0.0f;
             }
 
-            if (Math.Abs(chip.Delay) > 0.01) CurrentChips.Add(chip);
+            if (Math.Abs(chip.Delay) >= 0.01) CurrentChips.Add(chip);
         }
         else if (text.StartsWith("#GOGOSTART"))
         {

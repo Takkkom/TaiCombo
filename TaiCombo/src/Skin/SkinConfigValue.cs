@@ -14,6 +14,10 @@ class SkinConfigValue
         Height = 1080
     };
 
+    public string Font_Main { get; set; } = "Fonts/FOT-OedoKtr.otf";
+
+    public string Font_Sub { get; set; } = "Fonts/FOT-Seurat_Pro_B.otf";
+
     public MovePosJson Combo_Shine { get; set; } = new()
     {
         Pos = new PosJson[] { new PosJson() { X = 0, Y = -20 }, new PosJson() { X = 15, Y = -5 }, new PosJson() { X = -15, Y = 0 } },
@@ -66,11 +70,27 @@ class SkinConfigValue
                 Up = new string[] { "0" },
                 Down = new string[] { "0" },
                 Down_Clear = new string[] { "0" },
+                RollEffect = new string[] { "0" },
                 Footer = new string[] { "0", "1", "2" },
                 Dancer = new string[] { "0" },
                 Mob = new string[] { "0" },
             }
         }
+    };
+    public PosJson[] Play_Chara { get; set; } = new PosJson[] 
+    { 
+        new PosJson() { X = 0, Y = 0 }, 
+        new PosJson() { X = 0, Y = 805 } 
+    };
+
+    public PosJson[] Play_GoGoSplashs { get; set; } = new PosJson[] 
+    { 
+        new PosJson() { X = 120, Y = 810 }, 
+        new PosJson() { X = 460, Y = 810 }, 
+        new PosJson() { X = 784, Y = 810 }, 
+        new PosJson() { X = 1136, Y = 810 }, 
+        new PosJson() { X = 1460, Y = 810 }, 
+        new PosJson() { X = 1800, Y = 810 }
     };
 
     public PosJson[] Play_Lane_Frame { get; set; } = new PosJson[]
@@ -315,28 +335,34 @@ class SkinConfigValue
     public PosJson[] Play_Balloon_Base { get; set; } = new PosJson[] 
     { 
         new PosJson() { X = 580, Y = 43 }, 
-        new PosJson() { X = 580, Y = 307 } 
+        new PosJson() { X = 580, Y = 491 } 
     };
 
     public PaddingMultiPosJson Play_Balloon_Number { get; set; } = new()
     {
-        Pos = new PosJson[] { new PosJson() { X = 730, Y = 148 }, new PosJson() { X = 730, Y = 412 } },
+        Pos = new PosJson[] { new PosJson() { X = 730, Y = 148 }, new PosJson() { X = 730, Y = 596 } },
         Width = 80,
         Height = 95,
         Padding = 80
     };
 
+    public PosJson[] Play_Balloon_Chara { get; set; } = new PosJson[] 
+    { 
+        new PosJson() { X = 521, Y = 288 }, 
+        new PosJson() { X = 521, Y = 736 } 
+    };
+
     public PosJson[] Play_Balloon_Breaking { get; set; } = new PosJson[] 
     { 
         new PosJson() { X = 636, Y = 171 }, 
-        new PosJson() { X = 636, Y = 435 } 
+        new PosJson() { X = 636, Y = 619 } 
     };
 
     public MovePosJson Play_Balloon_Miss { get; set; } = new MovePosJson()
     { 
         Pos = new PosJson[]  {
             new PosJson() { X = 710, Y = 384 }, 
-            new PosJson() { X = 710, Y = 384 } 
+            new PosJson() { X = 710, Y = 832 } 
         },
         MoveX = 330,
         MoveY = 84,
@@ -352,9 +378,47 @@ class SkinConfigValue
 
     public MultiPosSizeJson Play_ScoreRank { get; set; } = new()
     {
-        Pos = new PosJson[]{ new PosJson() { X = 157, Y = 138 }, new PosJson() { X = 157, Y = 138 } },
+        Pos = new PosJson[]{ new PosJson() { X = 157, Y = 138 }, new PosJson() { X = 157, Y = 942 } },
         Width = 210,
         Height = 210
+    };
+
+    public PosJson Play_GenrePlate { get; set; } = new () { X = 1590, Y = 104 };
+    public TextInfoJson Play_GenrePlate_Name { get; set; } = new () 
+    {
+        Pos = new PosJson() { X = 144, Y = 16 },
+        Size = 20
+    };
+
+    public TitleInfoJson Play_Title { get; set; } = new () 
+    {
+        Pos = new PosJson() { X = 1875, Y = 100 },
+        Size = 55,
+        MaxSize = 1000
+    };
+
+    public TextInfoJson Play_SongCount_Desc_Count { get; set; } = new () 
+    {
+        Pos = new PosJson() { X = 120, Y = 29 },
+        Size = 20
+    };
+
+    public TextInfoJson Play_SongCount_Desc_Max { get; set; } = new () 
+    {
+        Pos = new PosJson() { X = 249, Y = 29 },
+        Size = 20
+    };
+
+    public TextInfoJson Play_SongCount_Value_Count { get; set; } = new () 
+    {
+        Pos = new PosJson() { X = 74, Y = 27 },
+        Size = 20
+    };
+
+    public TextInfoJson Play_SongCount_Value_Max { get; set; } = new () 
+    {
+        Pos = new PosJson() { X = 224, Y = 27 },
+        Size = 20
     };
 
     public HitSoundJson[] HitSounds = new HitSoundJson[]

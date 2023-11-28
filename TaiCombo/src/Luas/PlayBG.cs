@@ -4,8 +4,9 @@ using TaiCombo.Engine;
 
 namespace TaiCombo.Luas;
 
-class PlayBG : LuaScript
+class PlayBG : BaseScript
 {
+    private LuaFunction LuaFuncAddRollEffect;
     private LuaFunction LuaFuncClearIn;
     private LuaFunction LuaFuncClearOut;
     private LuaFunction LuaFuncMaxIn;
@@ -19,6 +20,11 @@ class PlayBG : LuaScript
     public void SetBPM(float[] bpm)
     {
         Script["bpm"] = bpm;
+    }
+
+    public void AddRollEffect(int player)
+    {
+        LuaFuncAddRollEffect.Call(player);
     }
 
     public void ClearIn(int player)
@@ -61,8 +67,9 @@ class PlayBG : LuaScript
         Script["p1IsBlue"] = p1IsBlue;
     }
 
-    public PlayBG(string fileName) : base(fileName)
+    public PlayBG(string fileName, FontRenderer mainFont, FontRenderer subFont) : base(fileName, mainFont, subFont)
     {
+        LuaFuncAddRollEffect = Script.GetFunction("addRollEffect");
         LuaFuncClearIn = Script.GetFunction("clearIn");
         LuaFuncClearOut = Script.GetFunction("clearOut");
         LuaFuncMaxIn = Script.GetFunction("maxIn");
