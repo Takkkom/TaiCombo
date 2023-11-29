@@ -50,6 +50,19 @@ static class NumHelper
         }
     }
 
+    public static void DrawResultNumber(int num, float x, float y, int width, int height, float padding, float scaleX, float scaleY, Sprite sprite, Color4? color = null)
+    {
+        int[] nums = SeparateDigits(num);
+        
+        for(int i = 0; i < nums.Length; i++)
+        {
+            RectangleF rectangle = new RectangleF(width * nums[i], 0, width, height);
+            float currnetX = x - (padding * i);
+            float currnetY = y;
+            sprite.Draw(currnetX, currnetY, scaleX:scaleX, scaleY:scaleY, rectangle:rectangle, drawOriginType:Engine.Enums.DrawOriginType.Center, color:color);
+        }
+    }
+
     public static void DrawNumber(int num, float x, float y, int width, int height, float padding, float scaleX, float scaleY, Sprite sprite, Color4? color = null)
     {
         int[] nums = SeparateDigits(num);

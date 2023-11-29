@@ -57,42 +57,49 @@ public class LuaFuncs : IDisposable
 
     public void DrawSpriteOpacity(float x, float y, float opacity, int index)
     {
+        if (index < 1) return;
         Sprite sprite = Sprites[index - 1];
         DrawSpriteFull(x, y, 1, 1, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, 0, 1, 1, 1, opacity, "Left_Up", "Normal", index);
     }
 
     public void DrawSpriteBlendOpacity(float x, float y, float opacity, string blend, int index)
     {
+        if (index < 1) return;
         Sprite sprite = Sprites[index - 1];
         DrawSpriteFull(x, y, 1, 1, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, 0, 1, 1, 1, opacity, "Left_Up", blend, index);
     }
 
     public void DrawSprite(float x, float y, int index)
     {
+        if (index < 1) return;
         Sprite sprite = Sprites[index - 1];
         DrawSpriteFull(x, y, 1, 1, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, 0, 1, 1, 1, 1, "Left_Up", "Normal", index);
     }
 
     public void DrawSpriteOrigin(float x, float y, string drawOrigin, int index)
     {
+        if (index < 1) return;
         Sprite sprite = Sprites[index - 1];
         DrawSpriteFull(x, y, 1, 1, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, 0, 1, 1, 1, 1, drawOrigin, "Normal", index);
     }
 
     public void DrawSpriteOriginScale(float x, float y, float scaleX, float scaleY, string drawOrigin, int index)
     {
+        if (index < 1) return;
         Sprite sprite = Sprites[index - 1];
         DrawSpriteFull(x, y, scaleX, scaleY, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, 0, 1, 1, 1, 1, drawOrigin, "Normal", index);
     }
 
     public void DrawSpriteOriginScaleAlpha(float x, float y, float scaleX, float scaleY, float alpha, string drawOrigin, int index)
     {
+        if (index < 1) return;
         Sprite sprite = Sprites[index - 1];
         DrawSpriteFull(x, y, scaleX, scaleY, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, 0, 1, 1, 1, alpha, drawOrigin, "Normal", index);
     }
 
     public void DrawSpriteOriginRotation(float x, float y, float rotation, string drawOrigin, int index)
     {
+        if (index < 1) return;
         Sprite sprite = Sprites[index - 1];
         DrawSpriteFull(x, y, 1, 1, 0, 0, sprite.TextureSize.Width, sprite.TextureSize.Height, false, false, rotation, 1, 1, 1, 1, drawOrigin, "Normal", index);
     }
@@ -107,6 +114,8 @@ public class LuaFuncs : IDisposable
         string drawOrigin, string blend,
         int index)
     {
+        if (index < 1) return;
+
         Sprite sprite = Sprites[index - 1];
 
         DrawOriginType drawOriginType;
@@ -172,12 +181,14 @@ public class LuaFuncs : IDisposable
 
     public int GetSpriteWidth(int index)
     {
+        if (index < 1) return -1;
         Sprite sprite = Sprites[index - 1];
         return sprite.TextureSize.Width;
     }
 
     public int GetSpriteHeight(int index)
     {
+        if (index < 1) return -1;
         Sprite sprite = Sprites[index - 1];
         return sprite.TextureSize.Height;
     }

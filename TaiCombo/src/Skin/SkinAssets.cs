@@ -162,6 +162,13 @@ class SkinAssets : IDisposable
     public EndAnineScript Play_EndAnime_AllPerfect { get; private set; }
 
     public Dictionary<string, Sprite> Play_Title_GenrePlate { get; private set; } = new();
+    
+    public ResultBG Result_Background { get; private set; }
+    public Sprite[] Result_Plate { get; private set; } = new Sprite[Game.MAXPLAYER];
+    public Sprite Result_Number { get; private set; }
+    public Sprite Result_ScoreNumber { get; private set; }
+    public Sprite[] Result_ScoreRanks { get; private set; } = new Sprite[(int)ScoreRankType.Omega];
+    public Sprite[] Result_Crowns { get; private set; } = new Sprite[(int)ClearType.AllPerfect];
 
     public Sound Decide { get; private set; }
     public Sound Change { get; private set; }
@@ -240,13 +247,25 @@ class SkinAssets : IDisposable
     }
 
     /// <summary>
-    /// PlayBGの作成と同時にDisposableAssetsに登録します
+    /// EndAnineScriptの作成と同時にDisposableAssetsに登録します
     /// </summary>
     /// <param name="path"></param>
     /// <returns></returns>
     private EndAnineScript CreateEndAnimeScript(string path)
     {
         EndAnineScript script = new(path, Font_Main, Font_Sub);
+        DisposableAssets.Add(script);
+        return script;
+    }
+
+    /// <summary>
+    /// ResultBGの作成と同時にDisposableAssetsに登録します
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    private ResultBG CreateResultBG(string path)
+    {
+        ResultBG script = new(path, Font_Main, Font_Sub);
         DisposableAssets.Add(script);
         return script;
     }
@@ -604,6 +623,26 @@ class SkinAssets : IDisposable
         {
             Play_Title_GenrePlate.Add(Path.GetFileNameWithoutExtension(genrePlates[i]), CreateSprite(genrePlates[i]));   
         }
+
+        string resultPath = $"{Game.Skin.GraphicsPath}Result{Path.DirectorySeparatorChar}";
+
+        Result_Background = CreateResultBG($"{resultPath}Background{Path.DirectorySeparatorChar}Script.lua");
+
+        Result_Plate[0] = CreateSprite($"{resultPath}Plate_Left.png");
+        Result_Plate[1] = CreateSprite($"{resultPath}Plate_Right.png");
+        Result_Number = CreateSprite($"{resultPath}Number.png");
+        Result_ScoreNumber = CreateSprite($"{resultPath}ScoreNumber.png");
+        Result_ScoreRanks[0] = CreateSprite($"{resultPath}ScoreRanks{Path.DirectorySeparatorChar}E.png");
+        Result_ScoreRanks[1] = CreateSprite($"{resultPath}ScoreRanks{Path.DirectorySeparatorChar}D.png");
+        Result_ScoreRanks[2] = CreateSprite($"{resultPath}ScoreRanks{Path.DirectorySeparatorChar}C.png");
+        Result_ScoreRanks[3] = CreateSprite($"{resultPath}ScoreRanks{Path.DirectorySeparatorChar}B.png");
+        Result_ScoreRanks[4] = CreateSprite($"{resultPath}ScoreRanks{Path.DirectorySeparatorChar}A.png");
+        Result_ScoreRanks[5] = CreateSprite($"{resultPath}ScoreRanks{Path.DirectorySeparatorChar}S.png");
+        Result_ScoreRanks[6] = CreateSprite($"{resultPath}ScoreRanks{Path.DirectorySeparatorChar}Omega.png");
+
+        Result_Crowns[0] = CreateSprite($"{resultPath}Crowns{Path.DirectorySeparatorChar}Clear.png");
+        Result_Crowns[1] = CreateSprite($"{resultPath}Crowns{Path.DirectorySeparatorChar}FullCombo.png");
+        Result_Crowns[2] = CreateSprite($"{resultPath}Crowns{Path.DirectorySeparatorChar}AllPerfect.png");
 
 
         Decide = CreateSound($"{Game.Skin.SoundsPath}Decide.ogg");

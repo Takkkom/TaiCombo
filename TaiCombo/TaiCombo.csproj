@@ -23,6 +23,7 @@
     <Content Include="Licenses/**" CopyToOutputDirectory="PreserveNewest"/>
     <Content Include="Skins/**" CopyToOutputDirectory="PreserveNewest"/>
     <Content Include="Songs/**" CopyToOutputDirectory="PreserveNewest"/>
+    <Content Include="Global/**" CopyToOutputDirectory="PreserveNewest"/>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TaiCombo.Engine\TaiCombo.Engine.csproj"/>

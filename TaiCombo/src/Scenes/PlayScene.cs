@@ -110,6 +110,8 @@ class PlayScene : Scene
     private Balloon[] Balloon = new Balloon[Game.MAXPLAYER];
 
     private ScoreRank[] ScoreRank = new ScoreRank[Game.MAXPLAYER];
+
+    private ClearType[] ClearTypes = new ClearType[Game.MAXPLAYER];
     
     private EndAnime EndAnime;
 
@@ -313,49 +315,79 @@ class PlayScene : Scene
                     {
                         Charas[player].ChangeAnime(CharaAnimeType.Jump_Max, player, false, () => SetNormalCharaAnime(player));
                         EndAnime.PlayAnime(ClearType.AllPerfect, player);
+                        ClearTypes[player] = ClearType.AllPerfect;
                     }
                     else if (States[player].Ok == 0)
                     {
                         Charas[player].ChangeAnime(CharaAnimeType.Jump_Max, player, false, () => SetNormalCharaAnime(player));
                         EndAnime.PlayAnime(ClearType.FullCombo, player);
+                        ClearTypes[player] = ClearType.FullCombo;
                     }
                     else
                     {
                         Charas[player].ChangeAnime(CharaAnimeType.ClearIn, player, false, () => SetNormalCharaAnime(player));
                         EndAnime.PlayAnime(ClearType.Clear, player);
+                        ClearTypes[player] = ClearType.Clear;
                     }
                 }
                 else 
                 {
                     Charas[player].ChangeAnime(CharaAnimeType.ClearOut, player, false, () => SetNormalCharaAnime(player));
                     EndAnime.PlayAnime(ClearType.None, player);
+                    ClearTypes[player] = ClearType.None;
                 }
 
-                Task.Run(() => 
+                if (player == 0)
                 {
-                    Thread.Sleep(8000);
-                    GameEngine.ASyncActions.Add(() => 
+                    Task.Run(() => 
                     {
-                        Game.Fade.StartFade(Game.Skin.Assets.Fade_Black, 1.5f, 0.5f, () =>
+                        Thread.Sleep(8000);
+                        GameEngine.ASyncActions.Add(() => 
                         {
-                            GameEngine.SceneManager_.ChangeScene(new ResultScene(new () 
-                            { 
-                                {
-                                    "Values", new ResultValues[2] { 
-                                        new ResultValues() 
-                                        { 
-
-                                        },
-                                        new ResultValues() 
-                                        { 
-
-                                        }  
+                            Game.Fade.StartFade(Game.Skin.Assets.Fade_Black, 1.5f, 0.5f, () =>
+                            {
+                                GameEngine.SceneManager_.ChangeScene(new ResultScene(new () 
+                                { 
+                                    { "PlayerCount", PlayerCount },
+                                    { "RightSide", RightSide },
+                                    { "GaugeType", GaugeType },
+                                    { "NamePlates", NamePlates },
+                                    { "Title", Chart.Title },
+                                    { "SubTitle", Chart.SubTitle },
+                                    { "Options", Options },
+                                    {
+                                        "Values", new ResultValues[2] { 
+                                            new ResultValues() 
+                                            { 
+                                                Gauge = States[0].Gauge,
+                                                Perfect = States[0].Perfect,
+                                                Ok = States[0].Ok,
+                                                Miss = States[0].Miss,
+                                                Roll = States[0].Roll,
+                                                MaxCombo = States[0].MaxCombo,
+                                                Score = States[0].Score,
+                                                ScoreRank = States[0].ScoreRank,
+                                                ClearType = ClearTypes[0]
+                                            },
+                                            new ResultValues() 
+                                            { 
+                                                Gauge = States[1].Gauge,
+                                                Perfect = States[1].Perfect,
+                                                Ok = States[1].Ok,
+                                                Miss = States[1].Miss,
+                                                Roll = States[1].Roll,
+                                                MaxCombo = States[1].MaxCombo,
+                                                Score = States[1].Score,
+                                                ScoreRank = States[1].ScoreRank,
+                                                ClearType = ClearTypes[1]
+                                            }  
+                                        }
                                     }
-                                }
-                            }));
+                                }));
+                            });
                         });
                     });
-                });
+                }
             }
             break;
         }
@@ -1078,7 +1110,7 @@ class PlayScene : Scene
 
         for(int player = 0; player < PlayerCount; player++)
         {
-            Charas[player] = Game.Skin.Assets.Characters["Dev"];
+            Charas[player] = Game.Skin.Assets.Characters["0"];
             Charas[player].LoadAssets();
             HitSound[player] = Game.Skin.Assets.HitSounds[Options[player].HitSound];
             NotePixelOffset[player] = (Options[player].Offset / 5.0f) * (Game.Skin.Value.Play_Notes.Padding / 36);

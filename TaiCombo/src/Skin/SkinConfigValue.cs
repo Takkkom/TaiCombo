@@ -14,9 +14,9 @@ class SkinConfigValue
         Height = 1080
     };
 
-    public string Font_Main { get; set; } = "Fonts/FOT-OedoKtr.otf";
+    public string Font_Main { get; set; } = "";
 
-    public string Font_Sub { get; set; } = "Fonts/FOT-Seurat_Pro_B.otf";
+    public string Font_Sub { get; set; } = "";
 
     public MovePosJson Combo_Shine { get; set; } = new()
     {
@@ -420,6 +420,53 @@ class SkinConfigValue
         Pos = new PosJson() { X = 224, Y = 27 },
         Size = 20
     };
+
+    public PosJson[] Result_Plate { get; set; } = new PosJson[] { new PosJson() { X = 0, Y = 0 }, new PosJson() { X = 960, Y = 0 } };
+    public PosJson[] Result_Gauge { get; set; } = new PosJson[] { new PosJson() { X = 87, Y = 217 }, new PosJson() { X = 1034, Y = 217 } };
+    
+    public PaddingMultiPosJson[] Result_Number { get; set; } = new PaddingMultiPosJson[]
+    {
+        new PaddingMultiPosJson()
+        {
+            Pos = new PosJson[] { new PosJson() { X = 860, Y = 313 }, new PosJson() { X = 860, Y = 375 }, new PosJson() { X = 860, Y = 438 }, new PosJson() { X = 860, Y = 500 }, new PosJson() { X = 860, Y = 562 } },
+            Width = 40,
+            Height = 50,
+            Padding = 32
+        },
+        new PaddingMultiPosJson()
+        {
+            Pos = new PosJson[] { new PosJson() { X = 1816, Y = 313 }, new PosJson() { X = 1816, Y = 375 }, new PosJson() { X = 1816, Y = 438 }, new PosJson() { X = 1816, Y = 500 }, new PosJson() { X = 1816, Y = 562 } },
+            Width = 40,
+            Height = 50,
+            Padding = 32
+        }
+    };
+
+    public PaddingMultiPosJson Result_ScoreNumber { get; set; } = new PaddingMultiPosJson()
+    {
+        Pos = new PosJson[] { new PosJson() { X = 424, Y = 362 }, new PosJson() { X = 1380, Y = 362 } },
+        Width = 80,
+        Height = 80,
+        Padding = 46
+    };
+
+    public PaddingMultiPosJson Result_ScoreRank { get; set; } = new PaddingMultiPosJson()
+    {
+        Pos = new PosJson[] { new PosJson() { X = 203, Y = 509 }, new PosJson() { X = 1159, Y = 509 } },
+        Width = 220,
+        Height = 220,
+        Padding = 200
+    };
+
+    public MultiPosSizeJson Result_Crown { get; set; } = new MultiPosSizeJson()
+    {
+        Pos = new PosJson[] { new PosJson() { X = 392, Y = 509 }, new PosJson() { X = 1348, Y = 509 } },
+        Width = 220,
+        Height = 220
+    };
+
+    public PosJson[] Result_NamePlate { get; set; } = new PosJson[] { new PosJson() { X = 36, Y = 925 }, new PosJson() { X = 1543, Y = 925 } };
+
 
     public HitSoundJson[] HitSounds = new HitSoundJson[]
     {

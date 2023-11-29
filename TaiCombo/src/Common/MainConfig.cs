@@ -15,7 +15,7 @@ class MainConfigValue
     public int WindowY { get; set; } = 100;
     public int WindowWidth { get; set; } = 1280;
     public int WindowHeight { get; set; } = 720;
-    public string Skin { get; set; } = "SimpleStyle";
+    public string Skin { get; set; } = "TempStyle";
     public string Langauge { get; set; } = "ja";
 }
 

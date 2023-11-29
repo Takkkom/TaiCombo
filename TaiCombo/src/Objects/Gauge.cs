@@ -136,10 +136,10 @@ class Gauge
         if (Value >= 100)
         {
             int nextFrame = (RainbowFrame + 1) % Rainbows.Length;
-            Rainbows[nextFrame].Draw(x, y, flipY:Player == 1);
+            Rainbows[nextFrame].Draw(x, y, scaleX:scale, scaleY:scale, flipY:Player == 1);
 
             float prevOpacity = 1 - ((RainbowCounter * Rainbows.Length) - RainbowFrame);
-            Rainbows[RainbowFrame].Draw(x, y, flipY:Player == 1, color:new Color4(1, 1, 1, prevOpacity));
+            Rainbows[RainbowFrame].Draw(x, y, scaleX:scale, scaleY:scale, flipY:Player == 1, color:new Color4(1, 1, 1, prevOpacity));
         }
 
         Frame.Draw(x, y, scaleX:scale, scaleY:scale, flipY:Player == 1, color:new Color4(1, 1, 1, 0.3f));
@@ -149,41 +149,47 @@ class Gauge
         int addPos = GaugeState - 1;
         if (GaugeState < ClearLine)
         {
-            AddEffect.Draw(x + (Game.Skin.Value.Gauge_Add.Pos.X * scale) + (addPos * Game.Skin.Value.Gauge_Add.Padding), y + (Game.Skin.Value.Gauge_Add.Pos.Y * scale), color:new(1, 1, 1, opacity), rectangle:new RectangleF(0, 0, Game.Skin.Value.Gauge_Add.Width, Game.Skin.Value.Gauge_Add.Height), flipY:Player == 1, blendType:BlendType.Add);
+            AddEffect.Draw(x + (Game.Skin.Value.Gauge_Add.Pos.X * scale) + (addPos * Game.Skin.Value.Gauge_Add.Padding * scale), y + (Game.Skin.Value.Gauge_Add.Pos.Y * scale), color:new(1, 1, 1, opacity), scaleX:scale, scaleY:scale, rectangle:new RectangleF(0, 0, Game.Skin.Value.Gauge_Add.Width, Game.Skin.Value.Gauge_Add.Height), flipY:Player == 1, blendType:BlendType.Add);
         }
         else if (GaugeState == ClearLine)
         {
-            AddEffect.Draw(x + (Game.Skin.Value.Gauge_Add.Pos.X * scale) + (addPos * Game.Skin.Value.Gauge_Add.Padding), y + (Game.Skin.Value.Gauge_Add.Pos.Y * scale), color:new(1, 1, 1, opacity), rectangle:new RectangleF(Game.Skin.Value.Gauge_Add.Width, 0, Game.Skin.Value.Gauge_Add.Width, Game.Skin.Value.Gauge_Add.Height), flipY:Player == 1, blendType:BlendType.Add);
+            AddEffect.Draw(x + (Game.Skin.Value.Gauge_Add.Pos.X * scale) + (addPos * Game.Skin.Value.Gauge_Add.Padding * scale), y + (Game.Skin.Value.Gauge_Add.Pos.Y * scale), color:new(1, 1, 1, opacity), scaleX:scale, scaleY:scale, rectangle:new RectangleF(Game.Skin.Value.Gauge_Add.Width, 0, Game.Skin.Value.Gauge_Add.Width, Game.Skin.Value.Gauge_Add.Height), flipY:Player == 1, blendType:BlendType.Add);
         }
         else if (GaugeState > ClearLine)
         {
-            AddEffect.Draw(x + (Game.Skin.Value.Gauge_Add.Pos.X * scale) + (addPos * Game.Skin.Value.Gauge_Add.Padding), y + (Game.Skin.Value.Gauge_Add.Pos.Y * scale), color:new(1, 1, 1, opacity), rectangle:new RectangleF(Game.Skin.Value.Gauge_Add.Width * 2, 0, Game.Skin.Value.Gauge_Add.Width, Game.Skin.Value.Gauge_Add.Height), flipY:Player == 1, blendType:BlendType.Add);
+            AddEffect.Draw(x + (Game.Skin.Value.Gauge_Add.Pos.X * scale) + (addPos * Game.Skin.Value.Gauge_Add.Padding * scale), y + (Game.Skin.Value.Gauge_Add.Pos.Y * scale), color:new(1, 1, 1, opacity), scaleX:scale, scaleY:scale, rectangle:new RectangleF(Game.Skin.Value.Gauge_Add.Width * 2, 0, Game.Skin.Value.Gauge_Add.Width, Game.Skin.Value.Gauge_Add.Height), flipY:Player == 1, blendType:BlendType.Add);
         }
 
         if (GaugeState == 50)
         {
-            Game.Skin.Assets.Gauge_SoulFire.Draw(x + Game.Skin.Value.Gauge_SoulFire.Pos[Player].X, y + Game.Skin.Value.Gauge_SoulFire.Pos[Player].Y, 
+            Game.Skin.Assets.Gauge_SoulFire.Draw(x + (Game.Skin.Value.Gauge_SoulFire.Pos[Player].X * scale), y + (Game.Skin.Value.Gauge_SoulFire.Pos[Player].Y * scale), 
+            scaleX:scale, scaleY:scale, 
             rectangle:new RectangleF(Game.Skin.Value.Gauge_SoulFire.Width * (int)(SoulFireCounter * 8), 0, Game.Skin.Value.Gauge_SoulFire.Width, Game.Skin.Value.Gauge_SoulFire.Height));
         }
 
         if (GaugeState < ClearLine)
         {
-            Game.Skin.Assets.Gauge_ClearText.Draw(x + Game.Skin.Value.Gauge_ClearText.Pos[Player].X + (Game.Skin.Value.Gauge_ClearText.Padding * (ClearLine - 1)), y + Game.Skin.Value.Gauge_ClearText.Pos[Player].Y, rectangle:new RectangleF(0, 0, Game.Skin.Value.Gauge_ClearText.Width, Game.Skin.Value.Gauge_ClearText.Height));
+            Game.Skin.Assets.Gauge_ClearText.Draw(x + (Game.Skin.Value.Gauge_ClearText.Pos[Player].X * scale) + (Game.Skin.Value.Gauge_ClearText.Padding * (ClearLine - 1) * scale), y + (Game.Skin.Value.Gauge_ClearText.Pos[Player].Y * scale), 
+            scaleX:scale, scaleY:scale, rectangle:new RectangleF(0, 0, Game.Skin.Value.Gauge_ClearText.Width, Game.Skin.Value.Gauge_ClearText.Height));
             
-            Game.Skin.Assets.Gauge_SoulText.Draw(x + Game.Skin.Value.Gauge_SoulText.Pos[Player].X, y + Game.Skin.Value.Gauge_SoulText.Pos[Player].Y, 
+            Game.Skin.Assets.Gauge_SoulText.Draw(x + (Game.Skin.Value.Gauge_SoulText.Pos[Player].X * scale), y + (Game.Skin.Value.Gauge_SoulText.Pos[Player].Y * scale), 
+            scaleX:scale, scaleY:scale, 
             rectangle:new RectangleF(0, 0, Game.Skin.Value.Gauge_SoulText.Width, Game.Skin.Value.Gauge_SoulText.Height));
         }
         else
         {
-            Game.Skin.Assets.Gauge_ClearText.Draw(x + Game.Skin.Value.Gauge_ClearText.Pos[Player].X + (Game.Skin.Value.Gauge_ClearText.Padding * (ClearLine - 1)), y + Game.Skin.Value.Gauge_ClearText.Pos[Player].Y, rectangle:new RectangleF(0, Game.Skin.Value.Gauge_ClearText.Height, Game.Skin.Value.Gauge_ClearText.Width, Game.Skin.Value.Gauge_ClearText.Height));
+            Game.Skin.Assets.Gauge_ClearText.Draw(x + (Game.Skin.Value.Gauge_ClearText.Pos[Player].X * scale) + (Game.Skin.Value.Gauge_ClearText.Padding * (ClearLine - 1) * scale), y + (Game.Skin.Value.Gauge_ClearText.Pos[Player].Y * scale), 
+            scaleX:scale, scaleY:scale, rectangle:new RectangleF(0, Game.Skin.Value.Gauge_ClearText.Height, Game.Skin.Value.Gauge_ClearText.Width, Game.Skin.Value.Gauge_ClearText.Height));
             
-            Game.Skin.Assets.Gauge_SoulText.Draw(x + Game.Skin.Value.Gauge_SoulText.Pos[Player].X, y + Game.Skin.Value.Gauge_SoulText.Pos[Player].Y, 
+            Game.Skin.Assets.Gauge_SoulText.Draw(x + (Game.Skin.Value.Gauge_SoulText.Pos[Player].X * scale), y + (Game.Skin.Value.Gauge_SoulText.Pos[Player].Y * scale), 
+            scaleX:scale, scaleY:scale, 
             rectangle:new RectangleF(Game.Skin.Value.Gauge_SoulText.Width, 0, Game.Skin.Value.Gauge_SoulText.Width, Game.Skin.Value.Gauge_SoulText.Height));
         }
 
         if (GaugeState == 50 && SoulFlashCounter >= 1)
         {
-            Game.Skin.Assets.Gauge_SoulText.Draw(x + Game.Skin.Value.Gauge_SoulText.Pos[Player].X, y + Game.Skin.Value.Gauge_SoulText.Pos[Player].Y, 
+            Game.Skin.Assets.Gauge_SoulText.Draw(x + (Game.Skin.Value.Gauge_SoulText.Pos[Player].X * scale), y + (Game.Skin.Value.Gauge_SoulText.Pos[Player].Y * scale), 
+            scaleX:scale, scaleY:scale, 
             rectangle:new RectangleF(Game.Skin.Value.Gauge_SoulText.Width * 2, 0, Game.Skin.Value.Gauge_SoulText.Width, Game.Skin.Value.Gauge_SoulText.Height));
         }
     }

@@ -25,4 +25,41 @@ static class EasingHelper
     {
         return (value < 0.5f ? value : (1.0f - value)) * 2;
     }
+
+    public static float ResultNumberIn(float value, float ext)
+    {
+        return 1 + (ext * (1.0f - value));
+    }
+
+    public static float ResultScoreNumberIn(float value, float ext1, float ext2, float timing)
+    {
+        float scale = 1;
+        if (value < timing)
+        {
+            float value1 = value / timing;
+            scale += MathF.Sin(value1 * MathF.PI) * ext1;
+        }
+        else if (value < 1) 
+        {
+            float value2 = (value - timing) / (1.0f - timing);
+            scale += BasicInOut(value2) * ext2;
+        }
+        return scale;
+    }
+
+    public static float ResultScoreRankIn(float value, float ext1, float ext2, float timing)
+    {
+        float scale = 1;
+        if (value < timing)
+        {
+            float value1 = MathF.Cos((value / timing) * MathF.PI / 2.0f);
+            scale += (value1 * ext1) + ((1.0f - value1) * ext2);
+        }
+        else if (value < 1) 
+        {
+            float value2 = (value - timing) / (1.0f - timing);
+            scale += (1.0f - value2) * ext2;
+        }
+        return scale;
+    }
 }
